@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "An SQLite Database for storing and retrieving data for researchers-refuge",
   "main": "app.js",
+  "engines": {
+    "node": "14.x",
+    "npm": "7.x"
+  },
   "scripts": {
     "start": "nodemon ./app.js",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'"
@@ -11,11 +15,11 @@
   "author": "Andreas Myklebust Skomsoy",
   "license": "MIT",
   "devDependencies": {
-    "cors": "^2.8.5",
-    "nodemon": "^1.18.3",
     "sequelize-cli": "^6.2.0"
   },
   "dependencies": {
+    "cors": "^2.8.5",
+    "nodemon": "^1.18.3",
     "bcryptjs": "^2.4.3",
     "cross-env": "^7.0.2",
     "express": "^4.17.1",
