@@ -12,6 +12,7 @@ const database = new Database(data, enableLogging);
 // intercept API calls and create an abstract layer between the caller and the target
 promiseFinally.shim();
 
+
 // initialize the new database
 database.init()
   .catch(err => console.error(err))
