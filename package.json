@@ -5,17 +5,18 @@
   "main": "app.js",
   "engines": {
     "node": "14.x",
-    "npm": "7.x"
+    "npm": "7.21.0"
   },
   "scripts": {
-    "start": "nodemon ./app.js",
+    "start": "node ./bin/www",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'"
   },
   "keywords": [],
   "author": "Andreas Myklebust Skomsoy",
   "license": "MIT",
   "devDependencies": {
-    "sequelize-cli": "^6.2.0"
+    "sequelize-cli": "^6.2.0",
+    "nodemon": "^2.0.12"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -26,7 +27,6 @@
     "http": "^0.0.1-security",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
-    "nodemon": "^2.0.12",
     "promise.prototype.finally": "^3.1.2",
     "sequelize": "^6.6.2",
     "sqlite3": "^4.2.0"
