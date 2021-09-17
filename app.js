@@ -40,7 +40,7 @@ app.use('/api', routes);
 // setup a friendly greeting for the root route
 app.get('/', asyncHandler(async (req, res) => {
   res.json({
-    message: 'This is an API SQLite Database with user and article info',
+    message: 'This is an API SQLite Database for the Researchers Refuge Website',
   });
 }));
 
@@ -79,10 +79,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// set our port
-app.set('port', process.env.PORT || 5000);
+module.exports = app;
 
-// start listening on our port
-const server = app.listen(app.get('port'), () => {
-  console.log(`Express server is listening on port ${server.address().port}`);
-});
+// // set our port
+// app.set('port', process.env.PORT || 5000);
+
+// // start listening on our port
+// const server = app.listen(app.get('port'), () => {
+//   console.log(`Express server is listening on port ${server.address().port}`);
+// });

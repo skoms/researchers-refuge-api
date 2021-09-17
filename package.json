@@ -18,15 +18,17 @@
     "sequelize-cli": "^6.2.0"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "nodemon": "^1.18.3",
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "cross-env": "^7.0.2",
+    "debug": "^4.3.2",
     "express": "^4.17.1",
+    "http": "^0.0.1-security",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
+    "nodemon": "^2.0.12",
     "promise.prototype.finally": "^3.1.2",
     "sequelize": "^6.6.2",
-    "sqlite3": "^5.0.0"
+    "sqlite3": "^4.2.0"
   }
 }
