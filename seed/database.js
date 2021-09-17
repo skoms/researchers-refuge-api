@@ -10,7 +10,7 @@ class Database {
     this.topics = seedData.topics;
     this.categories = seedData.categories;
     this.enableLogging = enableLogging;
-    this.context = new Context('ResearchersRefuge-Dev.db', enableLogging);
+    this.context = new Context('ResearchersRefuge-Prod.db', enableLogging);
   }
 
   // Log message if logging is enabled
