@@ -6,7 +6,6 @@ const bcrypt = require('bcryptjs');
    is stored and password is valid, then setting property of 'currentUser' to the request object to use in routes */
 module.exports = async (req, res, next) => {
   const userLogin = auth(req);
-  console.log(userLogin);
   let authenticated = false;
 
   if (userLogin) {
