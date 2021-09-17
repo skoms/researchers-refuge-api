@@ -177,9 +177,7 @@ router.get('/', asyncHandler(async (req, res) => {
   const { id, page } = req.query;
   const article = await Article.findByPk( id, { 
     attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'published', 'credits'], 
-    include: [ { model: User, attributes: { exclude: ['emailAddress', 'password', 'createdAt', 'updatedAt'] } } ],
-    limit: 10,
-    offset: page !== 0 ? ((page - 1) * 10) : 0
+    include: [ { model: User, attributes: { exclude: ['emailAddress', 'password', 'createdAt', 'updatedAt'] } } ]
   });
   if (article) {
     res.status(200).json(article);
