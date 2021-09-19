@@ -9,10 +9,10 @@ const config = require(__dirname + '/../config/config.json')[env];
 const db = {};
 
 let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
+if (process.env.DATABASE_URL) {
+  sequelize = new Sequelize(process.env.DATABASE_URL); // Used in Production (PostgreSQL)
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(config.database, config.username, config.password, config); // Used in Development (Sqlite3)
 }
 
 // Dynamically reads over all files in this models directory and makes a model for each file apart from 'index.js'

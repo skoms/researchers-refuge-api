@@ -1,14 +1,14 @@
 {
   "development": {
-    "storage": "ResearchersRefuge-Dev.db",
+    "database": "ResearchersRefuge-Dev.db",
     "dialect": "sqlite"
   },
   "test": {
-    "storage": "ResearchersRefuge-Test.db",
+    "database": "ResearchersRefuge-Test.db",
     "dialect": "sqlite"
   },
   "production": {
-    "storage": "ResearchersRefuge-Prod.db",
+    "database": "ResearchersRefuge-Prod.db",
     "dialect": "sqlite"
   }
 }
