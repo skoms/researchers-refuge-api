@@ -1,19 +1,23 @@
 'use strict';
+require('dotenv').config()
 
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+const config = require(__dirname + '/../config/config.js');
 const db = {};
 
 let sequelize;
+/*
 if (process.env.DATABASE_URL) {
   sequelize = new Sequelize(process.env.DATABASE_URL); // Used in Production (PostgreSQL)
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config); // Used in Development (Sqlite3)
+  sequelize = new Sequelize(config.database, config.username, config.password, config); // Used in Development
 }
+*/
+sequelize = new Sequelize(config.database, config.username, config.password, config); // Used in Development
 
 // Dynamically reads over all files in this models directory and makes a model for each file apart from 'index.js'
 fs

@@ -17,7 +17,7 @@ class Context {
 
   // Logs out query and params
   static log(text, params) {
-    console.info(`Running query: "${text}", with params: ${JSON.stringify(params)}`);
+    console.info(`\n\nRunning query: "${text}", \n\nwith params: ${JSON.stringify(params)}\n`);
   }
 
   // Prepare query and execute ( used to update, create etc )
