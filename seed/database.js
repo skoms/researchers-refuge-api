@@ -10,7 +10,7 @@ class Database {
     this.topics = seedData.topics;
     this.categories = seedData.categories;
     this.enableLogging = enableLogging;
-    this.context = new Context('ResearchersRefuge.db', enableLogging);
+    this.context = new Context('ResearchersRefuge', enableLogging);
   }
 
   // Log message if logging is enabled
@@ -20,20 +20,6 @@ class Database {
     }
   }
 
-  // Checks if table already exists
-  tableExists(tableName) {
-    this.log(`Checking if the ${tableName} table exists...`);
-
-    return this.context
-      .retrieveValue(`
-        SELECT EXISTS (
-          SELECT 1 
-          FROM sqlite_master 
-          WHERE type = 'table' AND name = ?
-        );
-      `, tableName);
-  }
-
   // Inserts users into database
   createUser(user) {
     return this.context
@@ -41,24 +27,27 @@ class Database {
         INSERT INTO Users
           (firstName, lastName, emailAddress, password, occupation, bio, mostActiveField, articles, credits, followers, following, profileImgURL, headerImgURL, accessLevel, accreditedArticles, discreditedArticles, createdAt, updatedAt)
         VALUES
-          (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'));
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW());
       `,
-      user.firstName,
-      user.lastName,
-      user.emailAddress,
-      user.password,
-      user.occupation,
-      user.bio,
-      user.mostActiveField,
-      user.articles,
-      user.credits,
-      user.followers,
-      user.following,
-      user.profileImgURL,
-      user.headerImgURL,
-      user.accessLevel,
-      user.accreditedArticles,
-      user.discreditedArticles);
+        [
+          user.firstName,
+          user.lastName,
+          user.emailAddress,
+          user.password,
+          user.occupation,
+          user.bio,
+          user.mostActiveField,
+          user.articles,
+          user.credits,
+          user.followers,
+          user.following,
+          user.profileImgURL,
+          user.headerImgURL,
+          user.accessLevel,
+          user.accreditedArticles,
+          user.discreditedArticles
+        ]
+      );
   }
 
   // Inserts article into database
@@ -68,17 +57,20 @@ class Database {
         INSERT INTO Articles
           (userId, topicId, title, topic, intro, body, tags, published, credits, createdAt, updatedAt)
         VALUES
-          (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'));
-      `,
-      article.userId,
-      article.topicId,
-      article.title,
-      article.topic,
-      article.intro,
-      article.body,
-      article.tags,
-      article.published,
-      article.credits);
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW());
+      `, 
+        [ 
+          article.userId, 
+          article.topicId, 
+          article.title, 
+          article.topic,
+          article.intro, 
+          article.body, 
+          article.tags, 
+          article.published,
+          article.credits 
+        ]
+      );
   }
 
   // Inserts topic into database
@@ -88,11 +80,9 @@ class Database {
         INSERT INTO Topics
           (categoryId, name, relatedTags, createdAt, updatedAt)
         VALUES
-          (?, ?, ?, datetime('now'), datetime('now'));
-      `,
-      topic.categoryId,
-      topic.name,
-      topic.relatedTags);
+          ($1, $2, $3, NOW(), NOW());
+      `, [ topic.categoryId, topic.name, topic.relatedTags ]
+      );
   }
 
   // Inserts categories into database
@@ -102,9 +92,9 @@ class Database {
         INSERT INTO Categories
           (name, createdAt, updatedAt)
         VALUES
-          (?, datetime('now'), datetime('now'));
-      `,
-      category.name);
+          ($1, NOW(), NOW());
+      `, [category.name]
+      );
   }
 
   // Hashes the passwords in the for the database
@@ -149,39 +139,34 @@ class Database {
 
   // Initializes all the databases if not already there, if they are, data gets dropped and filled with new seed data
   async init() {
-    const userTableExists = await this.tableExists('Users');
-
-    if (userTableExists) {
-      this.log('Dropping the Users table...');
-
-      await this.context.execute(`
-        DROP TABLE IF EXISTS Users;
-      `);
-    }
+    this.log('Dropping the Users table if exists...');
+    await this.context.execute(`
+      DROP TABLE IF EXISTS Users cascade;
+    `);
 
     this.log('Creating the Users table...');
 
     await this.context.execute(`
       CREATE TABLE Users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        firstName VARCHAR(255) NOT NULL DEFAULT '', 
-        lastName VARCHAR(255) NOT NULL DEFAULT '', 
-        emailAddress VARCHAR(255) NOT NULL DEFAULT '' UNIQUE, 
-        password VARCHAR(255) NOT NULL DEFAULT '', 
-        occupation VARCHAR(255) DEFAULT '', 
+        id BIGSERIAL PRIMARY KEY, 
+        firstName VARCHAR(50) NOT NULL DEFAULT '', 
+        lastName VARCHAR(50) NOT NULL DEFAULT '', 
+        emailAddress VARCHAR(120) NOT NULL DEFAULT '' UNIQUE, 
+        password VARCHAR(120) NOT NULL DEFAULT '', 
+        occupation VARCHAR(50) DEFAULT '', 
         bio VARCHAR(255) DEFAULT '', 
-        mostActiveField VARCHAR(255) DEFAULT '', 
+        mostActiveField VARCHAR(50) DEFAULT '', 
         articles INTEGER DEFAULT 0, 
         credits INTEGER DEFAULT 0, 
-        followers ARRAY DEFAULT [], 
-        following ARRAY DEFAULT [],
+        followers INTEGER[], 
+        following INTEGER[],
         profileImgURL VARCHAR(255) DEFAULT 'https://img.icons8.com/ios-glyphs/120/000000/test-account.png', 
         headerImgURL VARCHAR(255) DEFAULT 'https://placeimg.com/1000/150/tech', 
         accessLevel VARCHAR(255) DEFAULT 'none',
-        accreditedArticles ARRAY DEFAULT [],
-        discreditedArticles ARRAY DEFAULT [],
-        createdAt DATETIME NOT NULL, 
-        updatedAt DATETIME NOT NULL
+        accreditedArticles INTEGER[],
+        discreditedArticles INTEGER[],
+        createdAt timestamp NOT NULL, 
+        updatedAt timestamp NOT NULL
       );
     `);
 
@@ -193,53 +178,20 @@ class Database {
 
     await this.createUsers(users);
 
-    const topicTableExists = await this.tableExists('Topics');
-
-    if (topicTableExists) {
-      this.log('Dropping the Topics table...');
-
-      await this.context.execute(`
-        DROP TABLE IF EXISTS Topics;
-      `);
-    }
-
-    this.log('Creating the Topics table...');
-
-    await this.context.execute(`
-      CREATE TABLE Topics (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        name VARCHAR(255) NOT NULL DEFAULT '', 
-        relatedTags ARRAY NOT NULL DEFAULT [], 
-        createdAt DATETIME NOT NULL, 
-        updatedAt DATETIME NOT NULL,
-        categoryId INTEGER NOT NULL DEFAULT -1
-          REFERENCES Categories (id) ON DELETE CASCADE ON UPDATE CASCADE
-      );
-    `);
-
-    this.log('Creating the topic records...');
-
-    await this.createTopics(this.topics); 
     
-
-    const categoryTableExists = await this.tableExists('Categories');
-
-    if (categoryTableExists) {
-      this.log('Dropping the Categories table...');
-
-      await this.context.execute(`
-        DROP TABLE IF EXISTS Categories;
-      `);
-    }
+    this.log('Dropping the Categories table...');
+    await this.context.execute(`
+      DROP TABLE IF EXISTS Categories cascade;
+    `);
 
     this.log('Creating the Categories table...');
 
     await this.context.execute(`
       CREATE TABLE Categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        id BIGSERIAL PRIMARY KEY, 
         name VARCHAR(255) NOT NULL DEFAULT '', 
-        createdAt DATETIME NOT NULL, 
-        updatedAt DATETIME NOT NULL
+        createdAt timestamp NOT NULL, 
+        updatedAt timestamp NOT NULL
       );
     `);
 
@@ -247,30 +199,50 @@ class Database {
 
     await this.createCategories(this.categories);
 
-    const articleTableExists = await this.tableExists('Articles');
+    
+    this.log('Dropping the Topics table...');
+    await this.context.execute(`
+      DROP TABLE IF EXISTS Topics cascade;
+    `);  
 
-    if (articleTableExists) {
-      this.log('Dropping the Articles table...');
+    this.log('Creating the Topics table...');
 
-      await this.context.execute(`
-        DROP TABLE IF EXISTS Articles;
-      `);
-    }
+    await this.context.execute(`
+      CREATE TABLE Topics (
+        id BIGSERIAL PRIMARY KEY, 
+        name VARCHAR(255) NOT NULL DEFAULT '', 
+        relatedTags VARCHAR(255)[] NOT NULL, 
+        createdAt timestamp NOT NULL, 
+        updatedAt timestamp NOT NULL,
+        categoryId INTEGER NOT NULL DEFAULT -1
+          REFERENCES Categories (id) ON DELETE CASCADE ON UPDATE CASCADE
+      );    
+    `);  
+
+    this.log('Creating the topic records...');
+
+    await this.createTopics(this.topics); 
+        
+
+    this.log('Dropping the Articles table...');
+    await this.context.execute(`
+      DROP TABLE IF EXISTS Articles;
+    `);
 
     this.log('Creating the Articles table...');
 
     await this.context.execute(`
       CREATE TABLE Articles (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        id BIGSERIAL PRIMARY KEY, 
         title VARCHAR(255) NOT NULL DEFAULT '', 
         topic VARCHAR(255) NOT NULL DEFAULT '', 
         intro TEXT NOT NULL DEFAULT '', 
         body TEXT NOT NULL DEFAULT '', 
-        tags ARRAY NOT NULL DEFAULT [], 
+        tags VARCHAR(255)[] NOT NULL, 
         published DATE NOT NULL,
         credits INTEGER DEFAULT 0,
-        createdAt DATETIME NOT NULL, 
-        updatedAt DATETIME NOT NULL, 
+        createdAt timestamp NOT NULL, 
+        updatedAt timestamp NOT NULL, 
         userId INTEGER NOT NULL DEFAULT -1
           REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE,
         topicId INTEGER NOT NULL DEFAULT -1 

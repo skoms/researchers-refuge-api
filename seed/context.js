@@ -1,10 +1,21 @@
 'use strict';
 
-const sqlite3 = require('sqlite3');
+const { Pool } = require('pg');
+require('dotenv').config();
 
 class Context {
-  constructor(filename, enableLogging) {
-    this.db = new sqlite3.Database(filename);
+  constructor(databaseName, enableLogging) {
+    this.db = new Pool({
+      database: databaseName, 
+      user: 'postgres', 
+      password: process.env.POSTGRES_PASSWORD,
+      host: 'localhost',
+      port: '5432',
+      dialect: 'postgres',
+      max: 9,
+      min: 0,
+      idle: 10000
+    });;
     this.enableLogging = enableLogging;
   }
 
@@ -21,13 +32,13 @@ class Context {
   }
 
   // Prepare query and execute ( used to update, create etc )
-  execute(text, ...params) {
+  execute(text, params) {
     const sql = Context.prepareQuery(text);
     if (this.enableLogging) {
       Context.log(sql, params);
     }
     return new Promise((resolve, reject) => {
-      this.db.run(sql, params, (err) => {
+      this.db.query(sql, params, (err, res) => {
         if (err) {
           reject(err);
         } else {
@@ -38,13 +49,13 @@ class Context {
   }
 
   // Prepare query and execute, returns all rows with specific data
-  query(text, ...params) {
+  query(text, params) {
     const sql = Context.prepareQuery(text);
     if (this.enableLogging) {
       Context.log(sql, params);
     }
     return new Promise((resolve, reject) => {
-      this.db.all(sql, params, (err, data) => {
+      this.db.query(sql, params, (err, data) => {
         if (err) {
           reject(err);
         } else {
@@ -55,13 +66,13 @@ class Context {
   }
 
   // returns all data based on query
-  async retrieve(text, ...params) {
-    return this.query(text, ...params);
+  async retrieve(text, params) {
+    return this.query(text, params);
   }
 
   // returns one row of data based on query
-  async retrieveSingle(text, ...params) {
-    const data = await this.query(text, ...params);
+  async retrieveSingle(text, params) {
+    const data = await this.query(text, params);
     let record;
     if (data) {
       if (data.length === 1) {
@@ -74,8 +85,8 @@ class Context {
   }
 
   // returns one value of data based on query
-  async retrieveValue(text, ...params) {
-    const data = await this.query(text, ...params);
+  async retrieveValue(text, params) {
+    const data = await this.query(text, params);
     let record;
     let value;
     if (data && data.length === 1) {
