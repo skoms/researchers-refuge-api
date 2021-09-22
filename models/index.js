@@ -11,7 +11,7 @@ const db = {};
 // Checks for DATABASE_URL, will only exist if on Heroku(Production), sets up local dev if not
 let sequelize;
 if (process.env.DATABASE_URL) {
-  sequelize = new Sequelize(process.env.DATABASE_URL); // Used in Production (PostgreSQL)
+  sequelize = new Sequelize(process.env.DATABASE_URL, { dialect: "postgres", ssl: true, dialectOptions: { ssl: true } }); // Used in Production (PostgreSQL)
 } else {
   sequelize = new Sequelize(config.database, config.username, config.password, config); // Used in Development
 }
