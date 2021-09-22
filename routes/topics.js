@@ -31,15 +31,7 @@ const isStringAndStringToArray = (value) => {
 // GET finds and displays all topics
 router.get('/', asyncHandler(async (req, res) => {
   const topics = await Topic.findAll({
-    attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    include: [ { 
-      model: Article, 
-      attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'topicId', 'published', 'credits'],
-      include: [{
-        model: User,
-        attributes: ['firstName', 'lastName']
-      }] 
-    }]
+    attributes: ['id', 'name', 'relatedTags', 'categoryId']
   });
 
   res.status(200).json(topics);
@@ -49,14 +41,6 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/tag', asyncHandler(async (req, res) => {
   const topics = await Topic.findAll({
     attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    include: [ { 
-      model: Article, 
-      attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'topicId', 'published', 'credits'],
-      include: [{
-        model: User,
-        attributes: ['firstName', 'lastName']
-      }] 
-    }],
     where: { relatedTags: { [Op.substring]: req.query.tag } }
   });
 
@@ -71,14 +55,6 @@ router.get('/tag', asyncHandler(async (req, res) => {
 router.get('/query', asyncHandler(async (req, res) => {
   const topics = await Topic.findAll({
     attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    include: [ { 
-      model: Article, 
-      attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'topicId', 'published', 'credits'],
-      include: [{
-        model: User,
-        attributes: ['firstName', 'lastName']
-      }] 
-    }],
     where: { 
       [Op.or]: [
       { name: { [Op.substring]: req.query.query } },
@@ -97,14 +73,6 @@ router.get('/query', asyncHandler(async (req, res) => {
 router.get('/name', asyncHandler(async (req, res) => {
   const topic = await Topic.findOne({
     attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    include: [{ 
-      model: Article, 
-      attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'topicId', 'published', 'credits'],
-      include: [{
-        model: User,
-        attributes: ['firstName', 'lastName']
-      }]
-    }],
     where: { name: req.query.name }
   });
 
@@ -118,15 +86,7 @@ router.get('/name', asyncHandler(async (req, res) => {
 // GET finds and displays a specific topic by ID
 router.get('/id', asyncHandler(async (req, res) => {
   const topic = await Topic.findByPk(req.query.id, {
-    attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    include: [ { 
-      model: Article, 
-      attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'topicId', 'published', 'credits'],
-      include: [{
-        model: User,
-        attributes: ['firstName', 'lastName']
-      }] 
-    }]
+    attributes: ['id', 'name', 'relatedTags', 'categoryId']
   });
 
   if( topic ) {

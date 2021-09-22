@@ -37,11 +37,7 @@ module.exports = (sequelize) => {
 
   Topic.associate = (models) => {  
     Topic.hasMany(models.Article);
-    Topic.belongsTo(models.Category, {
-      foreignKey: {
-        fieldName: 'categoryId',
-      }
-    });
+    Topic.belongsTo(models.Category, { foreignKey: 'categoryId' });
   }
 
   return Topic;

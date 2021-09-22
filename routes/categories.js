@@ -14,6 +14,7 @@ const { Op } = Sequelize;
 // GET finds and sends back all the categories and all the topics that are a part of it
 router.get('/', asyncHandler(async (req, res) => {
   const categories = await Category.findAll({
+    nest: true,
     attributes: ['id', 'name'], 
     include: [{ model: Topic, attributes: ['categoryId','id', 'name', 'relatedTags'] }]});
 

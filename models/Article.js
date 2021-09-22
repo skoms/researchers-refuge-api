@@ -81,16 +81,8 @@ module.exports = (sequelize) => {
   }, { sequelize });
 
   Article.associate = (models) => {  
-    Article.belongsTo(models.User, {
-      foreignKey: {
-        fieldName: 'userId',
-      }
-    });
-    Article.belongsTo(models.Topic, {
-      foreignKey: {
-        fieldName: 'topicId',
-      }
-    });
+    Article.belongsTo(models.Topic, { foreignKey: 'topicId' });
+    Article.belongsTo(models.User, { foreignKey: 'userId' });
   }
 
   return Article;
