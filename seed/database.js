@@ -24,8 +24,8 @@ class Database {
   createUser(user) {
     return this.context
       .execute(`
-        INSERT INTO Users
-          (firstName, lastName, emailAddress, password, occupation, bio, mostActiveField, articles, credits, followers, following, profileImgURL, headerImgURL, accessLevel, accreditedArticles, discreditedArticles, createdAt, updatedAt)
+        INSERT INTO "Users"
+          ("firstName", "lastName", "emailAddress", "password", "occupation", "bio", "mostActiveField", "articles", "credits", "followers", "following", "profileImgURL", "headerImgURL", "accessLevel", "accreditedArticles", "discreditedArticles", "createdAt", "updatedAt")
         VALUES
           ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW());
       `,
@@ -54,8 +54,8 @@ class Database {
   createArticle(article) {
     return this.context
       .execute(`
-        INSERT INTO Articles
-          (userId, topicId, title, topic, intro, body, tags, published, credits, createdAt, updatedAt)
+        INSERT INTO "Articles"
+          ("userId", "topicId", "title", "topic", "intro", "body", "tags", "published", "credits", "createdAt", "updatedAt")
         VALUES
           ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW());
       `, 
@@ -77,8 +77,8 @@ class Database {
   createTopic(topic) {
     return this.context
       .execute(`
-        INSERT INTO Topics
-          (categoryId, name, relatedTags, createdAt, updatedAt)
+        INSERT INTO "Topics"
+          ("categoryId", "name", "relatedTags", "createdAt", "updatedAt")
         VALUES
           ($1, $2, $3, NOW(), NOW());
       `, [ topic.categoryId, topic.name, topic.relatedTags ]
@@ -89,8 +89,8 @@ class Database {
   createCategory(category) {
     return this.context
       .execute(`
-        INSERT INTO Categories
-          (name, createdAt, updatedAt)
+        INSERT INTO "Categories"
+          ("name", "createdAt", "updatedAt")
         VALUES
           ($1, NOW(), NOW());
       `, [category.name]
@@ -141,32 +141,32 @@ class Database {
   async init() {
     this.log('Dropping the Users table if exists...');
     await this.context.execute(`
-      DROP TABLE IF EXISTS Users cascade;
+      DROP TABLE IF EXISTS "Users" cascade;
     `);
 
     this.log('Creating the Users table...');
 
     await this.context.execute(`
-      CREATE TABLE Users (
-        id BIGSERIAL PRIMARY KEY, 
-        firstName VARCHAR(50) NOT NULL DEFAULT '', 
-        lastName VARCHAR(50) NOT NULL DEFAULT '', 
-        emailAddress VARCHAR(120) NOT NULL DEFAULT '' UNIQUE, 
-        password VARCHAR(120) NOT NULL DEFAULT '', 
-        occupation VARCHAR(50) DEFAULT '', 
-        bio VARCHAR(255) DEFAULT '', 
-        mostActiveField VARCHAR(50) DEFAULT '', 
-        articles INTEGER DEFAULT 0, 
-        credits INTEGER DEFAULT 0, 
-        followers INTEGER[], 
-        following INTEGER[],
-        profileImgURL VARCHAR(255) DEFAULT 'https://img.icons8.com/ios-glyphs/120/000000/test-account.png', 
-        headerImgURL VARCHAR(255) DEFAULT 'https://placeimg.com/1000/150/tech', 
-        accessLevel VARCHAR(255) DEFAULT 'none',
-        accreditedArticles INTEGER[],
-        discreditedArticles INTEGER[],
-        createdAt timestamp NOT NULL, 
-        updatedAt timestamp NOT NULL
+      CREATE TABLE "Users" (
+        "id" BIGSERIAL PRIMARY KEY, 
+        "firstName" VARCHAR(50) NOT NULL DEFAULT '', 
+        "lastName" VARCHAR(50) NOT NULL DEFAULT '', 
+        "emailAddress" VARCHAR(120) NOT NULL DEFAULT '' UNIQUE, 
+        "password" VARCHAR(120) NOT NULL DEFAULT '', 
+        "occupation" VARCHAR(50) DEFAULT '', 
+        "bio" VARCHAR(255) DEFAULT '', 
+        "mostActiveField" VARCHAR(50) DEFAULT '', 
+        "articles" INTEGER DEFAULT 0, 
+        "credits" INTEGER DEFAULT 0, 
+        "followers" INTEGER[], 
+        "following" INTEGER[],
+        "profileImgURL" VARCHAR(255) DEFAULT 'https://img.icons8.com/ios-glyphs/120/000000/test-account.png', 
+        "headerImgURL" VARCHAR(255) DEFAULT 'https://placeimg.com/1000/150/tech', 
+        "accessLevel" VARCHAR(255) DEFAULT 'none',
+        "accreditedArticles" INTEGER[],
+        "discreditedArticles" INTEGER[],
+        "createdAt" timestamp NOT NULL, 
+        "updatedAt" timestamp NOT NULL
       );
     `);
 
@@ -181,17 +181,17 @@ class Database {
     
     this.log('Dropping the Categories table...');
     await this.context.execute(`
-      DROP TABLE IF EXISTS Categories cascade;
+      DROP TABLE IF EXISTS "Categories" cascade;
     `);
 
     this.log('Creating the Categories table...');
 
     await this.context.execute(`
-      CREATE TABLE Categories (
-        id BIGSERIAL PRIMARY KEY, 
-        name VARCHAR(255) NOT NULL DEFAULT '', 
-        createdAt timestamp NOT NULL, 
-        updatedAt timestamp NOT NULL
+      CREATE TABLE "Categories" (
+        "id" BIGSERIAL PRIMARY KEY, 
+        "name" VARCHAR(255) NOT NULL DEFAULT '', 
+        "createdAt" timestamp NOT NULL, 
+        "updatedAt" timestamp NOT NULL
       );
     `);
 
@@ -202,20 +202,20 @@ class Database {
     
     this.log('Dropping the Topics table...');
     await this.context.execute(`
-      DROP TABLE IF EXISTS Topics cascade;
+      DROP TABLE IF EXISTS "Topics" cascade;
     `);  
 
     this.log('Creating the Topics table...');
 
     await this.context.execute(`
-      CREATE TABLE Topics (
-        id BIGSERIAL PRIMARY KEY, 
-        name VARCHAR(255) NOT NULL DEFAULT '', 
-        relatedTags VARCHAR(255)[] NOT NULL, 
-        createdAt timestamp NOT NULL, 
-        updatedAt timestamp NOT NULL,
-        categoryId INTEGER NOT NULL DEFAULT -1
-          REFERENCES Categories (id) ON DELETE CASCADE ON UPDATE CASCADE
+      CREATE TABLE "Topics" (
+        "id" BIGSERIAL PRIMARY KEY, 
+        "name" VARCHAR(255) NOT NULL DEFAULT '', 
+        "relatedTags" VARCHAR(255)[] NOT NULL, 
+        "createdAt" timestamp NOT NULL, 
+        "updatedAt" timestamp NOT NULL,
+        "categoryId" INTEGER NOT NULL DEFAULT -1
+          REFERENCES "Categories" (id) ON DELETE CASCADE ON UPDATE CASCADE
       );    
     `);  
 
@@ -226,27 +226,27 @@ class Database {
 
     this.log('Dropping the Articles table...');
     await this.context.execute(`
-      DROP TABLE IF EXISTS Articles;
+      DROP TABLE IF EXISTS "Articles";
     `);
 
     this.log('Creating the Articles table...');
 
     await this.context.execute(`
-      CREATE TABLE Articles (
-        id BIGSERIAL PRIMARY KEY, 
-        title VARCHAR(255) NOT NULL DEFAULT '', 
-        topic VARCHAR(255) NOT NULL DEFAULT '', 
-        intro TEXT NOT NULL DEFAULT '', 
-        body TEXT NOT NULL DEFAULT '', 
-        tags VARCHAR(255)[] NOT NULL, 
-        published DATE NOT NULL,
-        credits INTEGER DEFAULT 0,
-        createdAt timestamp NOT NULL, 
-        updatedAt timestamp NOT NULL, 
-        userId INTEGER NOT NULL DEFAULT -1
-          REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE,
-        topicId INTEGER NOT NULL DEFAULT -1 
-          REFERENCES Topics (id) ON DELETE CASCADE ON UPDATE CASCADE
+      CREATE TABLE "Articles" (
+        "id" BIGSERIAL PRIMARY KEY, 
+        "title" VARCHAR(255) NOT NULL DEFAULT '', 
+        "topic" VARCHAR(255) NOT NULL DEFAULT '', 
+        "intro" TEXT NOT NULL DEFAULT '', 
+        "body" TEXT NOT NULL DEFAULT '', 
+        "tags" VARCHAR(255)[] NOT NULL, 
+        "published" DATE NOT NULL,
+        "credits" INTEGER DEFAULT 0,
+        "createdAt" timestamp NOT NULL, 
+        "updatedAt" timestamp NOT NULL, 
+        "userId" INTEGER NOT NULL DEFAULT -1
+          REFERENCES "Users" (id) ON DELETE CASCADE ON UPDATE CASCADE,
+        "topicId" INTEGER NOT NULL DEFAULT -1 
+          REFERENCES "Topics" (id) ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);
 

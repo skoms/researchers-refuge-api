@@ -11,8 +11,7 @@ const authenticateLogin = require('../middleware/user-auth');
 const { Article, User, Topic, Category } = require('../models');
 
 // Import Op
-const { Sequelize } = require('../models');
-const { Op } = Sequelize;
+const { Op } = require('../models').Sequelize;
 
 // Helper function
 const isStringAndStringToArray = (value) => {
@@ -174,15 +173,19 @@ router.get('/following', authenticateLogin, asyncHandler(async (req, res) => {
 
 // GET finds specified article and basic info on its owner
 router.get('/', asyncHandler(async (req, res) => {
-  const { id, page } = req.query;
-  const article = await Article.findByPk( id, { 
-    attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'published', 'credits'], 
-    include: [ { model: User, attributes: { exclude: ['emailAddress', 'password', 'createdAt', 'updatedAt'] } } ]
-  });
-  if (article) {
-    res.status(200).json(article);
-  } else {
-    res.status(404).end();
+  try {
+    const { id } = req.query;
+    const article = await Article.findByPk( id, { 
+      attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'published', 'credits'], 
+      include: [ { model: User, attributes: { exclude: ['emailAddress', 'password', 'createdAt', 'updatedAt'] } } ]
+    });
+    if (article) {
+      res.status(200).json(article);
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.log(error)
   }
 }));
 
