@@ -3,6 +3,7 @@ const router = express.Router();
 
 // Import middlewares
 const asyncHandler = require('../middleware/async-handler');
+const authenticateLogin = require('../middleware/user-auth');
 
 // Import Models
 const { Article, User, Topic, Category } = require('../models');
