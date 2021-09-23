@@ -121,7 +121,7 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
 }));
 
 // POST creates a new topic ( Admin Only )
-router.post('/', authenticateLogin, asyncHandler(async (req, res) => {
+router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
   const isAdmin = req.currentUser.accessLevel === 'admin';
   if (isAdmin) {
     const topic = await Topic.create(req.body);

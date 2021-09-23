@@ -59,4 +59,15 @@ router.get('/query', asyncHandler(async (req, res) => {
   }
 }));
 
+// POST creates a new topic ( Admin Only )
+router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
+  const isAdmin = req.currentUser.accessLevel === 'admin';
+  if (isAdmin) {
+    await Category.create(req.body);
+    res.status(201).end();
+  } else {
+    res.status(403).end();
+  }
+}));
+
 module.exports = router;

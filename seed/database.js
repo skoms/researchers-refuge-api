@@ -158,13 +158,13 @@ class Database {
         "mostActiveField" VARCHAR(50) DEFAULT '', 
         "articles" INTEGER DEFAULT 0, 
         "credits" INTEGER DEFAULT 0, 
-        "followers" INTEGER[], 
-        "following" INTEGER[],
+        "followers" INTEGER[] DEFAULT '{}', 
+        "following" INTEGER[] DEFAULT '{}',
         "profileImgURL" VARCHAR(255) DEFAULT 'https://img.icons8.com/ios-glyphs/120/000000/test-account.png', 
         "headerImgURL" VARCHAR(255) DEFAULT 'https://placeimg.com/1000/150/tech', 
         "accessLevel" VARCHAR(255) DEFAULT 'none',
-        "accreditedArticles" INTEGER[],
-        "discreditedArticles" INTEGER[],
+        "accreditedArticles" INTEGER[] DEFAULT '{}',
+        "discreditedArticles" INTEGER[] DEFAULT '{}',
         "createdAt" timestamp NOT NULL, 
         "updatedAt" timestamp NOT NULL
       );
