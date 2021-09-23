@@ -151,7 +151,7 @@ class Database {
         "id" BIGSERIAL PRIMARY KEY, 
         "firstName" VARCHAR(50) NOT NULL DEFAULT '', 
         "lastName" VARCHAR(50) NOT NULL DEFAULT '', 
-        "emailAddress" VARCHAR(120) NOT NULL DEFAULT '' UNIQUE, 
+        "emailAddress" VARCHAR(120) UNIQUE NOT NULL DEFAULT '', 
         "password" VARCHAR(120) NOT NULL DEFAULT '', 
         "occupation" VARCHAR(50) DEFAULT '', 
         "bio" VARCHAR(255) DEFAULT '', 
