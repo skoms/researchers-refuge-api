@@ -141,13 +141,39 @@ router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
 
 // PUT updates the chosen user if authenticated to do so
 router.put('/', authenticateLogin, asyncHandler(async (req, res) => {
-  const owner = await User.findOne({ where: { id: req.query.id } });
-
+  const { source, id  } = req.query;
+  const owner = await User.findOne({ where: { id: id } });
   const isOwner = owner.emailAddress === req.currentUser.emailAddress;
   const isAdmin = req.currentUser.accessLevel === 'admin';
+  let updatedData = {};
+
+  if (source === 'admin' && isAdmin) {
+    updatedData = { ...req.body };
+  } else if (source === 'My Profile') {
+    updatedData = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      occupation: req.body.occupation,
+      mostActiveField: req.body.mostActiveField,
+      bio: req.body.bio
+    }
+  } else if (source === 'My Account') {
+    updatedData = {
+      emailAddress: req.body.emailAddress,
+      password: req.body.password
+    }
+  } else if (source === 'img/header') {
+    updatedData = {
+      headerImgURL: req.body.headerImgURL
+    }
+  } else if (source === 'img/profile') {
+    updatedData = {
+      profileImgURL: req.body.profileImgURL
+    }
+  }
 
   if (isOwner || isAdmin) {
-    await User.update(req.body, { where: { id: req.query.id } })
+    await User.update(updatedData, { where: { id: id } })
       .then(response => {
         if (!response.name) {
           res.status(204).end()
