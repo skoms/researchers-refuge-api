@@ -63,3 +63,6 @@ typings/
 # SQLite Test/Dev database file
 ResearchersRefuge-Dev.db
 ResearchersRefuge-Test.db
+
+# TEMP FILE
+temp
