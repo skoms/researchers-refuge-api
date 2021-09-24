@@ -95,7 +95,7 @@ router.get('/tag', asyncHandler(async (req, res) => {
     attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'topicId', 'published', 'credits'], 
     include: [{ model: User, attributes: ['firstName', 'lastName']}],
     where: { [Op.and]: [
-        { tags: { [Op.substring]: tag } },
+        { tags: { [Op.contains]: [tag] } },
         { id: { [Op.not]: id} },
       ] 
     },
@@ -122,7 +122,7 @@ router.get('/query', asyncHandler(async (req, res) => {
         { topic: { [Op.substring]: query } },
         { intro: { [Op.substring]: query } },
         { body:  { [Op.substring]: query } },
-        { tags:  { [Op.substring]: query } }
+        { tags:  { [Op.contains]: [query] } }
       ]
     },
     limit: 10,

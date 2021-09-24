@@ -23,9 +23,10 @@ router.get('/', asyncHandler(async (req, res) => {
 
 // GET finds and sends back a specific topics by tag
 router.get('/tag', asyncHandler(async (req, res) => {
+  const { tag } = req.query;
   const topics = await Topic.findAll({
     attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    where: { relatedTags: { [Op.substring]: req.query.tag } }
+    where: { relatedTags: { [Op.contains]: [tag] } }
   });
 
   if( topics ) {
@@ -37,12 +38,13 @@ router.get('/tag', asyncHandler(async (req, res) => {
 
 // GET finds and sends back specific topics by query
 router.get('/query', asyncHandler(async (req, res) => {
+  const { query } = req.query;
   const topics = await Topic.findAll({
     attributes: ['id', 'name', 'relatedTags', 'categoryId'],
     where: { 
       [Op.or]: [
-      { name: { [Op.substring]: req.query.query } },
-      { relatedTags: { [Op.substring]: req.query.query } }
+      { name: { [Op.substring]: query } },
+      { relatedTags: { [Op.contains]: [query] } }
     ]}
   });
 
