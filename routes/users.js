@@ -142,9 +142,8 @@ router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
 // PUT updates the chosen user if authenticated to do so
 router.put('/', authenticateLogin, asyncHandler(async (req, res) => {
   const { source, id  } = req.query;
-  const owner = await User.findOne({ where: { id: id } });
-  const isOwner = owner.emailAddress === req.currentUser.emailAddress;
-  const isAdmin = req.currentUser.accessLevel === 'admin' || req.currentUser.emailAddress === 'root@admin.com';
+  const isOwner = req.currentUser.id === id;
+  const isAdmin = req.currentUser.accessLevel === 'admin';
   let updatedData = {};
 
   if (source === 'admin' && isAdmin) {
