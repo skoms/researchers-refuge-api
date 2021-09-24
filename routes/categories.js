@@ -9,8 +9,7 @@ const authenticateLogin = require('../middleware/user-auth');
 const { Article, User, Topic, Category } = require('../models');
 
 // Import Op
-const { Sequelize } = require('../models');
-const { Op } = Sequelize;
+const { Op } = require('../models').Sequelize;
 
 // GET finds and sends back all the categories and all the topics that are a part of it
 router.get('/', asyncHandler(async (req, res) => {

@@ -13,20 +13,6 @@ const { Article, User, Topic, Category } = require('../models');
 // Import Op
 const { Op } = require('../models').Sequelize;
 
-// Helper function
-const isStringAndStringToArray = (value) => {
-  if (typeof value !== 'object') {
-    if (value.length === 1 || typeof value === 'number') {
-      return [value.toString()];
-    } else if (value === '') {
-      return [];
-    } else {
-      return value.split(',').filter(entry => entry !== ' ' && entry !== '');
-    }
-  } else {
-    return value;
-  }
-}
 
 // GET finds and displays all the articles based on filter and basic info on their owners
 router.get('/filter', asyncHandler(async (req, res) => {
@@ -77,13 +63,10 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
     attributes: ['accreditedArticles', 'discreditedArticles'],
     where: { emailAddress: req.currentUser.emailAddress } 
   });
-
-  const accreditedArticles = isStringAndStringToArray(user.accreditedArticles);
-  const discreditedArticles = isStringAndStringToArray(user.discreditedArticles);
   
   const accreditedOnes = await Article.findAll({
     attributes: ['topicId'],
-    where: { id: { [Op.in]: accreditedArticles } }
+    where: { id: { [Op.in]: user.accreditedArticles } }
   });
 
   const topicIds = new Set(accreditedOnes.map( article => article.topicId ));
@@ -92,8 +75,8 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
     where: {
       [Op.and]:[
         { topicId: { [Op.in]: topicIds } },
-        { id: { [Op.notIn]: accreditedArticles } },
-        { id: { [Op.notIn]: discreditedArticles } }
+        { id: { [Op.notIn]: user.accreditedArticles } },
+        { id: { [Op.notIn]: user.discreditedArticles } }
       ]
     }
   })
@@ -157,12 +140,11 @@ router.get('/query', asyncHandler(async (req, res) => {
 router.get('/following', authenticateLogin, asyncHandler(async (req, res) => {
   const { page } = req.query;
   const user = await User.findOne({ where: { emailAddress: req.currentUser.emailAddress }});
-  const following = isStringAndStringToArray(user.following);
 
   const articles = await Article.findAll({
     attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'topicId', 'published', 'credits'], 
     include: [{ model: User, attributes: ['firstName', 'lastName']}],
-    where: { userId: { [Op.in]: following } },
+    where: { userId: { [Op.in]: user.following } },
     order: [['published', 'DESC']],
     limit: 10,
     offset: page !== 0 ? ((page - 1) * 10) : 0
@@ -262,11 +244,13 @@ router.put('/credit', authenticateLogin, asyncHandler(async (req, res) => {
   const article = await Article.findOne({ where: { id: req.query.id } });
   const creditor = await User.findOne({ where: {emailAddress: req.currentUser.emailAddress} });
 
-  const accreditedArticles = isStringAndStringToArray(creditor.accreditedArticles);
-  const alreadyAccredited = accreditedArticles.includes(article.id.toString());
+  const articleId = typeof article.id === 'number' ? article.id : parseInt(article.id);
 
-  const discreditedArticles = isStringAndStringToArray(creditor.discreditedArticles);
-  const alreadyDiscredited = discreditedArticles.includes(article.id.toString());
+  const accreditedArticles = creditor.accreditedArticles;
+  const discreditedArticles = creditor.discreditedArticles;
+
+  const alreadyAccredited = accreditedArticles.includes( articleId );
+  const alreadyDiscredited = discreditedArticles.includes( articleId );
   
   const isAccrediting = req.body.credit === 'accredit';
 
@@ -295,19 +279,19 @@ router.put('/credit', authenticateLogin, asyncHandler(async (req, res) => {
           let updatedDiscreditedArticles;
 
           if (isAccrediting && !alreadyAccredited) {
-            updatedAccreditedArticles = [...accreditedArticles, article.id.toString()];
+            updatedAccreditedArticles = [...accreditedArticles, articleId];
           } else if (isAccrediting && alreadyAccredited) {
-            updatedAccreditedArticles = accreditedArticles.filter( id => id !== article.id.toString());
+            updatedAccreditedArticles = accreditedArticles.filter( id => id !== articleId);
           } else if (!isAccrediting && alreadyAccredited) {
-            updatedAccreditedArticles = accreditedArticles.filter( id => id !== article.id.toString());
+            updatedAccreditedArticles = accreditedArticles.filter( id => id !== articleId);
           }
 
           if (!isAccrediting && !alreadyDiscredited) {
-            updatedDiscreditedArticles = [...discreditedArticles, article.id.toString()];
+            updatedDiscreditedArticles = [...discreditedArticles, articleId];
           } else if (!isAccrediting && alreadyDiscredited) {
-            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== article.id.toString());
+            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== articleId);
           } else if (isAccrediting && alreadyDiscredited) {
-            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== article.id.toString());
+            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== articleId);
           }
 
           await User.update(
