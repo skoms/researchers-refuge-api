@@ -9,23 +9,8 @@ const authenticateLogin = require('../middleware/user-auth');
 const { Article, User, Topic, Category } = require('../models');
 
 // Import Op
-const { Sequelize } = require('../models');
-const { Op } = Sequelize;
+const { Op } = require('../models').Sequelize;
 
-// Helper function
-const isStringAndStringToArray = (value) => {
-  if (typeof value !== 'object') {
-    if (value.length === 1 || typeof value === 'number') {
-      return [value.toString()];
-    } else if (value === '') {
-      return [];
-    } else {
-      return value.split(',').filter(entry => entry !== ' ' && entry !== '');
-    }
-  } else {
-    return value;
-  }
-}
 
 // GET finds specified user by ID
 router.get('/', asyncHandler(async (req, res) => {
@@ -54,8 +39,8 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
     where: { emailAddress: req.currentUser.emailAddress } 
   });
 
-  const following = isStringAndStringToArray(user.following);
-  const accreditedArticles = isStringAndStringToArray(user.accreditedArticles);
+  const following = user.following;
+  const accreditedArticles = user.accreditedArticles;
 
   const accreditedOnes = await Article.findAll({
     attributes: ['topicId'],
@@ -198,10 +183,14 @@ router.put('/follow', authenticateLogin, asyncHandler(async (req, res) => {
 
   if (isOnline && user.id !== target.id) {
     // Programatically checks and updates for both follow and unfollow, making sure you cant follow more than once
-    const following = user.following.split(',');
-    const followers = target.followers.split(',');
-    const updatedFollowing = !following.includes(target.id.toString()) ? [...following, target.id] : following.filter( id => id !== target.id.toString() );
-    const updatedFollowers= !followers.includes(user.id.toString()) ? [...followers, user.id] : followers.filter( id => id !== user.id.toString() );
+    const userId = typeof user.id === 'number' ? user.id : parseInt(user.id);
+    const targetId = typeof target.id === 'number' ? target.id : parseInt(target.id);
+
+    const following = user.following;
+    const followers = target.followers;
+
+    const updatedFollowing = !following.includes(targetId) ? [...following, targetId] : following.filter( id => id !== targetId );
+    const updatedFollowers= !followers.includes(userId) ? [...followers, userId] : followers.filter( id => id !== userId );
 
     // Update the two users with the respective data
     const userRes = await User.update(

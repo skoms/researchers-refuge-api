@@ -9,23 +9,7 @@ const authenticateLogin = require('../middleware/user-auth');
 const { Article, User, Topic, Category } = require('../models');
 
 // Import Op
-const { Sequelize } = require('../models');
-const { Op } = Sequelize;
-
-// Helper function
-const isStringAndStringToArray = (value) => {
-  if (typeof value !== 'object') {
-    if (value.length === 1 || typeof value === 'number') {
-      return [value.toString()];
-    } else if (value === '') {
-      return [];
-    } else {
-      return value.split(',').filter(entry => entry !== ' ' && entry !== '');
-    }
-  } else {
-    return value;
-  }
-}
+const { Op } = require('../models').Sequelize;
 
 
 // GET finds and displays all topics
@@ -102,10 +86,9 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
     attributes: ['accreditedArticles'],
     where: { emailAddress: req.currentUser.emailAddress } 
   });
-  const accreditedArticles = isStringAndStringToArray(user.accreditedArticles);
   const articles = await Article.findAll({
     attributes: ['topicId'],
-    where: { id: { [Op.in]: accreditedArticles } }
+    where: { id: { [Op.in]: user.accreditedArticles } }
   });
   const articleTopicIds = articles.map( article => article.topicId );
   const topics = await Topic.findAll({
