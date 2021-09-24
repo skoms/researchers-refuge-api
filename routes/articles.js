@@ -30,41 +30,45 @@ const isStringAndStringToArray = (value) => {
 
 // GET finds and displays all the articles based on filter and basic info on their owners
 router.get('/filter', asyncHandler(async (req, res) => {
-  const { filter, page } = req.query;
-  let articles;
-  if (filter === 'top') {
-    articles = await Article.findAll({
-      include: [ { model: User, attributes: ['firstName', 'lastName'] }],
-      order: [['credits', 'DESC']],
-      limit: 10,
-      offset: page !== 0 ? ((page - 1) * 10) : 0
-    });
-  } else if (filter === 'new') {
-    articles = await Article.findAll({
-      include: [ { model: User, attributes: ['firstName', 'lastName'] }],
-      order: [['published', 'DESC']],
-      limit: 10,
-      offset: page !== 0 ? ((page - 1) * 10) : 0
-    });
-  } else if (filter === 'popular') {
-    const aMonthAgo = moment([ moment().year(), moment().month() - 1, moment().date()]).format('YYYY-MM-DD');
-    
-    articles = await Article.findAll({
-      include: [ { model: User, attributes: ['firstName', 'lastName'] }],
-      order: [['credits', 'DESC']],
-      where: { published: { [Op.gte]: aMonthAgo }},
-      limit: 10,
-      offset: page !== 0 ? ((page - 1) * 10) : 0
-    });
-  } else {
-    articles = await Article.findAll({
-      include: [ { model: User, attributes: ['firstName', 'lastName'] }],
-      limit: 10,
-      offset: page !== 0 ? ((page - 1) * 10) : 0
-    });
-  }
+  try {
+    const { filter, page } = req.query;
+    let articles;
+    if (filter === 'top') {
+      articles = await Article.findAll({
+        include: [ { model: User, attributes: ['firstName', 'lastName'] }],
+        order: [['credits', 'DESC']],
+        limit: 10,
+        offset: page !== 0 ? ((page - 1) * 10) : 0
+      });
+    } else if (filter === 'new') {
+      articles = await Article.findAll({
+        include: [ { model: User, attributes: ['firstName', 'lastName'] }],
+        order: [['published', 'DESC']],
+        limit: 10,
+        offset: page !== 0 ? ((page - 1) * 10) : 0
+      });
+    } else if (filter === 'popular') {
+      const aMonthAgo = moment([ moment().year(), moment().month() - 1, moment().date()]).format('YYYY-MM-DD');
+      
+      articles = await Article.findAll({
+        include: [ { model: User, attributes: ['firstName', 'lastName'] }],
+        order: [['credits', 'DESC']],
+        where: { published: { [Op.gte]: aMonthAgo }},
+        limit: 10,
+        offset: page !== 0 ? ((page - 1) * 10) : 0
+      });
+    } else {
+      articles = await Article.findAll({
+        include: [ { model: User, attributes: ['firstName', 'lastName'] }],
+        limit: 10,
+        offset: page !== 0 ? ((page - 1) * 10) : 0
+      });
+    }
 
-  res.status(200).json(articles);
+    res.status(200).json(articles);
+  } catch (error) {
+    console.log(error)
+  }
 }));
 
 // GET finds and displays recommended topics

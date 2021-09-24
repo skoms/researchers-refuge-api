@@ -36,7 +36,7 @@ module.exports = (sequelize) => {
   }, { sequelize });
 
   Topic.associate = (models) => {  
-    Topic.hasMany(models.Article);
+    Topic.hasMany(models.Article, { foreignKey: 'topicId' });
     Topic.belongsTo(models.Category, { foreignKey: 'categoryId' });
   }
 
