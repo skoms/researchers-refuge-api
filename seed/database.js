@@ -148,7 +148,7 @@ class Database {
 
     await this.context.execute(`
       CREATE TABLE "Users" (
-        "id" BIGSERIAL PRIMARY KEY, 
+        "id" SERIAL PRIMARY KEY, 
         "firstName" VARCHAR(50) NOT NULL DEFAULT '', 
         "lastName" VARCHAR(50) NOT NULL DEFAULT '', 
         "emailAddress" VARCHAR(120) UNIQUE NOT NULL DEFAULT '', 
@@ -188,7 +188,7 @@ class Database {
 
     await this.context.execute(`
       CREATE TABLE "Categories" (
-        "id" BIGSERIAL PRIMARY KEY, 
+        "id" SERIAL PRIMARY KEY, 
         "name" VARCHAR(255) NOT NULL DEFAULT '', 
         "createdAt" timestamp NOT NULL, 
         "updatedAt" timestamp NOT NULL
@@ -209,7 +209,7 @@ class Database {
 
     await this.context.execute(`
       CREATE TABLE "Topics" (
-        "id" BIGSERIAL PRIMARY KEY, 
+        "id" SERIAL PRIMARY KEY, 
         "name" VARCHAR(255) NOT NULL DEFAULT '', 
         "relatedTags" VARCHAR(255)[] NOT NULL, 
         "createdAt" timestamp NOT NULL, 
@@ -233,7 +233,7 @@ class Database {
 
     await this.context.execute(`
       CREATE TABLE "Articles" (
-        "id" BIGSERIAL PRIMARY KEY, 
+        "id" SERIAL PRIMARY KEY, 
         "title" VARCHAR(255) NOT NULL DEFAULT '', 
         "topic" VARCHAR(255) NOT NULL DEFAULT '', 
         "intro" TEXT NOT NULL DEFAULT '', 
