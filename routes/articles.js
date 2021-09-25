@@ -13,25 +13,29 @@ const { Article, User, Topic, Category } = require('../models');
 // Import Op
 const { Op } = require('../models').Sequelize;
 
+const articleLimit = 5;
+
 
 // GET finds and displays all the articles based on filter and basic info on their owners
 router.get('/filter', asyncHandler(async (req, res) => {
   try {
     const { filter, page } = req.query;
     let articles;
+    let count = filter !== 'popular' ? await Article.count() : null;
+
     if (filter === 'top') {
       articles = await Article.findAll({
         include: [ { model: User, attributes: ['firstName', 'lastName'] }],
         order: [['credits', 'DESC']],
-        limit: 10,
-        offset: page !== 0 ? ((page - 1) * 10) : 0
+        limit: articleLimit,
+        offset: page !== 0 ? ((page - 1) * articleLimit) : 0
       });
     } else if (filter === 'new') {
       articles = await Article.findAll({
         include: [ { model: User, attributes: ['firstName', 'lastName'] }],
         order: [['published', 'DESC']],
-        limit: 10,
-        offset: page !== 0 ? ((page - 1) * 10) : 0
+        limit: articleLimit,
+        offset: page !== 0 ? ((page - 1) * articleLimit) : 0
       });
     } else if (filter === 'popular') {
       const aMonthAgo = moment([ moment().year(), moment().month() - 1, moment().date()]).format('YYYY-MM-DD');
@@ -40,18 +44,24 @@ router.get('/filter', asyncHandler(async (req, res) => {
         include: [ { model: User, attributes: ['firstName', 'lastName'] }],
         order: [['credits', 'DESC']],
         where: { published: { [Op.gte]: aMonthAgo }},
-        limit: 10,
-        offset: page !== 0 ? ((page - 1) * 10) : 0
+        limit: articleLimit,
+        offset: page !== 0 ? ((page - 1) * articleLimit) : 0
+      });
+
+      count = await Article.count({ 
+        where: { published: { [Op.gte]: aMonthAgo } }
       });
     } else {
       articles = await Article.findAll({
         include: [ { model: User, attributes: ['firstName', 'lastName'] }],
-        limit: 10,
-        offset: page !== 0 ? ((page - 1) * 10) : 0
+        limit: articleLimit,
+        offset: page !== 0 ? ((page - 1) * articleLimit) : 0
       });
     }
+    const hasMore = (count - (page * articleLimit)) > 0;
+    const lastPage = Math.ceil(count / articleLimit);
 
-    res.status(200).json(articles);
+    res.status(200).json({ articles, hasMore, lastPage });
   } catch (error) {
     console.log(error)
   }
@@ -78,11 +88,12 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
         { id: { [Op.notIn]: user.accreditedArticles } },
         { id: { [Op.notIn]: user.discreditedArticles } }
       ]
-    }
+    },
+    limit: 3
   })
 
   if( articles ) {
-    res.status(200).json(articles.slice(0,3));
+    res.status(200).json(articles);
   } else {
     res.status(404).end();
   }
@@ -99,8 +110,8 @@ router.get('/tag', asyncHandler(async (req, res) => {
         { id: { [Op.not]: id} },
       ] 
     },
-    limit: 10,
-    offset: page !== 0 ? ((page - 1) * 10) : 0
+    limit: articleLimit,
+    offset: page !== 0 ? ((page - 1) * articleLimit) : 0
   });
 
   if( articles ) {
@@ -125,12 +136,23 @@ router.get('/query', asyncHandler(async (req, res) => {
         { tags:  { [Op.contains]: [query] } }
       ]
     },
-    limit: 10,
-    offset: page !== 0 ? ((page - 1) * 10) : 0
+    limit: articleLimit,
+    offset: page !== 0 ? ((page - 1) * articleLimit) : 0
   });
+  const count = await Article.count({ where: { 
+    [Op.or]: [
+      { title: { [Op.substring]: query } },
+      { topic: { [Op.substring]: query } },
+      { intro: { [Op.substring]: query } },
+      { body:  { [Op.substring]: query } },
+      { tags:  { [Op.contains]: [query] } }
+    ]
+  }});
+  const hasMore = (count - (page * articleLimit)) > 0;
+  const lastPage = Math.ceil(count / articleLimit);
 
   if( articles ) {
-    res.status(200).json(articles);
+    res.status(200).json({articles, hasMore, lastPage});
   } else {
     res.status(404).end();
   }
@@ -146,12 +168,17 @@ router.get('/following', authenticateLogin, asyncHandler(async (req, res) => {
     include: [{ model: User, attributes: ['firstName', 'lastName']}],
     where: { userId: { [Op.in]: user.following } },
     order: [['published', 'DESC']],
-    limit: 10,
-    offset: page !== 0 ? ((page - 1) * 10) : 0
+    limit: articleLimit,
+    offset: page !== 0 ? ((page - 1) * articleLimit) : 0
   });
+  const count = await Article.count({ 
+    where: { userId:{ [Op.in]: user.following } }
+  });
+  const hasMore = (count - (page * articleLimit)) > 0;
+  const lastPage = Math.ceil(count / articleLimit);
 
   if( articles ) {
-    res.status(200).json(articles);
+    res.status(200).json({articles, hasMore, lastPage});
   } else {
     res.status(404).end();
   }
@@ -178,12 +205,15 @@ router.get('/owner', asyncHandler(async (req, res) => {
     attributes: ['id', 'title', 'topic', 'intro', 'body', 'tags', 'userId', 'published', 'credits'], 
     include: [{ model: User, attributes: ['firstName', 'lastName', 'emailAddress', 'accessLevel']}],
     where: { userId: id },
-    limit: 10,
-    offset: page !== 0 ? ((page - 1) * 10) : 0
+    limit: articleLimit,
+    offset: page !== 0 ? ((page - 1) * articleLimit) : 0
   });
+  const count = await Article.count({ where: { userId: id } });
+  const hasMore = (count - (page * articleLimit)) > 0;
+  const lastPage = Math.ceil(count / articleLimit);
 
   if (articles) {
-    res.status(200).json(articles);
+    res.status(200).json({articles, hasMore, lastPage});
   } else {
     res.status(404).end();
   }
