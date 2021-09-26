@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const moment = require('moment');
 
 // Import middlewares
 const asyncHandler = require('../middleware/async-handler');
@@ -11,6 +12,7 @@ const { Article, User, Topic, Category } = require('../models');
 // Import Op
 const { Op } = require('../models').Sequelize;
 
+const articleLimit = 5;
 
 // GET finds and displays all topics
 router.get('/', asyncHandler(async (req, res) => {
@@ -57,20 +59,86 @@ router.get('/query', asyncHandler(async (req, res) => {
 
 // GET finds and displays a specific topic by name
 router.get('/name', asyncHandler(async (req, res) => {
-  const topic = await Topic.findOne({
-    attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    where: { name: req.query.name },
-    include: [{
-      model: Article,
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
-      include: [{ model: User, attributes: ['firstName', 'lastName']}],
-    }]
-  });
+  try {
+    const { name, filter, page } = req.query;
+    let topic;
+    let count;
 
-  if( topic ) {
-    res.status(200).json(topic);
-  } else {
-    res.status(404).end();
+    if (filter === 'top') {
+      topic = await Topic.findOne({
+        attributes: ['id', 'name', 'relatedTags', 'categoryId'],
+        where: { name: name },
+        include: [{
+          model: Article,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [{ model: User, attributes: ['firstName', 'lastName']}],
+          order: [['credits', 'DESC']],
+          limit: articleLimit,
+          offset: page !== 0 ? ((page - 1) * articleLimit) : 0
+        }]
+      });
+      count = await Article.count({ where: { topicId: topic.id } });
+    } else if (filter === 'new') {
+      topic = await Topic.findOne({
+        attributes: ['id', 'name', 'relatedTags', 'categoryId'],
+        where: { name: name },
+        include: [{
+          model: Article,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [{ model: User, attributes: ['firstName', 'lastName']}],
+          order: [['published', 'DESC']],
+          limit: articleLimit,
+          offset: page !== 0 ? ((page - 1) * articleLimit) : 0
+        }]
+      });
+      count = await Article.count({ where: { topicId: topic.id } });
+    } else if (filter === 'popular') {
+      const aMonthAgo = moment([ moment().year(), moment().month() - 1, moment().date()]).format('YYYY-MM-DD');
+
+      topic = await Topic.findOne({
+        attributes: ['id', 'name', 'relatedTags', 'categoryId'],
+        where: { name: name },
+        include: [{
+          model: Article,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [{ model: User, attributes: ['firstName', 'lastName']}],
+          order: [['credits', 'DESC']],
+          where: { published: { [Op.gte]: aMonthAgo }},
+          limit: articleLimit,
+          offset: page !== 0 ? ((page - 1) * articleLimit) : 0
+        }]
+      });
+
+      count = await Article.count({ 
+        where: { [Op.and] : [
+          { published: { [Op.gte]: aMonthAgo } },
+          { topicId: topic.id }
+        ] }
+      });
+    } else {
+      topic = await Topic.findOne({
+        attributes: ['id', 'name', 'relatedTags', 'categoryId'],
+        where: { name: name },
+        include: [{
+          model: Article,
+          attributes: { exclude: ['createdAt', 'updatedAt'] },
+          include: [{ model: User, attributes: ['firstName', 'lastName']}],
+          limit: articleLimit,
+          offset: page !== 0 ? ((page - 1) * articleLimit) : 0
+        }]
+      });
+      count = await Article.count({ where: { topicId: topic.id } });
+    }
+    const hasMore = (count - (page * articleLimit)) > 0;
+    const lastPage = Math.ceil(count / articleLimit);
+
+    if( topic ) {
+      res.status(200).json({topic, hasMore, lastPage});
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    console.log(error)
   }
 }));
 
