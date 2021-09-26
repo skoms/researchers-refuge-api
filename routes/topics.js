@@ -59,7 +59,12 @@ router.get('/query', asyncHandler(async (req, res) => {
 router.get('/name', asyncHandler(async (req, res) => {
   const topic = await Topic.findOne({
     attributes: ['id', 'name', 'relatedTags', 'categoryId'],
-    where: { name: req.query.name }
+    where: { name: req.query.name },
+    include: [{
+      model: Article,
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+      include: [{ model: User, attributes: ['firstName', 'lastName']}],
+    }]
   });
 
   if( topic ) {
