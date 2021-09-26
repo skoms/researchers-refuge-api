@@ -226,6 +226,10 @@ router.post('/', authenticateLogin, asyncHandler(async (req, res) => {
   if (topic) {
     req.body.topicId = topic.id;
     const article = await Article.create(req.body);
+    await User.update(
+      { articles: req.currentUser.articles + 1 },
+      { where: { id: req.body.userId }}
+    );
     res.status(201).json(article);
   } else {
     res.status(400).send(`Unable to find '${req.body.topic}'.`);
@@ -240,6 +244,11 @@ router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
     if (topic) {
       req.body.topicId = topic.id;
       const article = await Article.create(req.body);
+      const owner = await User.findByPk(req.body.userId);
+      await User.update(
+        { articles: owner.articles + 1 },
+        { where: { id: req.body.userId }}
+      );
       res.status(201).json(article);
     } else {
       res.status(400).send(`Unable to find '${req.body.topic}'.`);
@@ -367,15 +376,22 @@ router.put('/credit', authenticateLogin, asyncHandler(async (req, res) => {
 
 // DELETE deletes the chosen article if the user is authenticated to do so
 router.delete('/', authenticateLogin, asyncHandler(async (req, res) => {
-  const article = await Article.findOne({ where: { id: req.query.id } });
+  const { id } = req.query;
+  const article = await Article.findOne({ where: { id: id } });
   const owner = await User.findOne({ where: { id: article.userId }});
   
   const isOwner = owner.emailAddress === req.currentUser.emailAddress;
   const isAdmin = req.currentUser.accessLevel === 'admin';
 
   if (isOwner || isAdmin) {
-    await Article.destroy({ where: { id: req.query.id } })
-      .then(res.status(204).end());
+    await Article.destroy({ where: { id: id } })
+      .then(async () => {
+        await User.update(
+            { articles: owner.articles - 1 }, 
+            { where: { id: article.userId } }
+          );
+        res.status(204).end();
+      });
   } else {
     res.status(403).end();
   }
