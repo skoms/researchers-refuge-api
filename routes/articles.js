@@ -271,32 +271,40 @@ router.put('/', authenticateLogin, asyncHandler(async (req, res) => {
 
 // PUT updates an articles credits (accredits or discredits article) 
 router.put('/credit', authenticateLogin, asyncHandler(async (req, res) => {
-  const article = await Article.findOne({ where: { id: req.query.id } });
+  const article = await Article.findOne({ 
+    where: { id: req.query.id }, 
+    include: User
+  });
   const creditor = await User.findOne({ where: {emailAddress: req.currentUser.emailAddress} });
-
-  const articleId = typeof article.id === 'number' ? article.id : parseInt(article.id);
 
   const accreditedArticles = creditor.accreditedArticles;
   const discreditedArticles = creditor.discreditedArticles;
 
-  const alreadyAccredited = accreditedArticles.includes( articleId );
-  const alreadyDiscredited = discreditedArticles.includes( articleId );
+  const alreadyAccredited = accreditedArticles.includes( article.id );
+  const alreadyDiscredited = discreditedArticles.includes( article.id );
   
   const isAccrediting = req.body.credit === 'accredit';
 
   let updatedCredits;
+  let updatedUserCredits;
   if (isAccrediting && alreadyDiscredited) {
-    updatedCredits = article.credits + 2 
+    updatedCredits = article.credits + 2;
+    updatedUserCredits = article.User.credits + 2;
   } else if (isAccrediting && !alreadyAccredited) {
-    updatedCredits = article.credits + 1 
+    updatedCredits = article.credits + 1;
+    updatedUserCredits = article.User.credits + 1; 
   } else if (!isAccrediting && alreadyDiscredited) {
-    updatedCredits = article.credits + 1 
+    updatedCredits = article.credits + 1;
+    updatedUserCredits = article.User.credits + 1;
   } else if (isAccrediting && alreadyAccredited) {
-    updatedCredits = article.credits - 1 
+    updatedCredits = article.credits - 1;
+    updatedUserCredits = article.User.credits - 1; 
   } else if (!isAccrediting && !alreadyAccredited) {
-    updatedCredits = article.credits - 1 
+    updatedCredits = article.credits - 1;
+    updatedUserCredits = article.User.credits - 1; 
   } else if (!isAccrediting && alreadyAccredited) {
-    updatedCredits = article.credits - 2 
+    updatedCredits = article.credits - 2;
+    updatedUserCredits = article.User.credits - 2; 
   }
 
   if (article) {
@@ -309,21 +317,25 @@ router.put('/credit', authenticateLogin, asyncHandler(async (req, res) => {
           let updatedDiscreditedArticles;
 
           if (isAccrediting && !alreadyAccredited) {
-            updatedAccreditedArticles = [...accreditedArticles, articleId];
+            updatedAccreditedArticles = [...accreditedArticles, article.id];
           } else if (isAccrediting && alreadyAccredited) {
-            updatedAccreditedArticles = accreditedArticles.filter( id => id !== articleId);
+            updatedAccreditedArticles = accreditedArticles.filter( id => id !== article.id);
           } else if (!isAccrediting && alreadyAccredited) {
-            updatedAccreditedArticles = accreditedArticles.filter( id => id !== articleId);
+            updatedAccreditedArticles = accreditedArticles.filter( id => id !== article.id);
           }
 
           if (!isAccrediting && !alreadyDiscredited) {
-            updatedDiscreditedArticles = [...discreditedArticles, articleId];
+            updatedDiscreditedArticles = [...discreditedArticles, article.id];
           } else if (!isAccrediting && alreadyDiscredited) {
-            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== articleId);
+            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== article.id);
           } else if (isAccrediting && alreadyDiscredited) {
-            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== articleId);
+            updatedDiscreditedArticles = discreditedArticles.filter( id => id !== article.id);
           }
 
+          await User.update(
+            { credits: updatedUserCredits },
+            { where: { id: article.User.id } }
+          );
           await User.update(
             { 
               accreditedArticles: updatedAccreditedArticles,
@@ -333,13 +345,17 @@ router.put('/credit', authenticateLogin, asyncHandler(async (req, res) => {
             .then( async (response) => {
               if (!response.name) {
                 const updatedUser = await User.findOne({ 
-                  attributes: { exclude: ['password', 'createdAt'] }, 
+                  attributes: { exclude: ['password', 'createdAt', 'updatedAt'] }, 
                   where: { emailAddress: req.currentUser.emailAddress } 
                 });
                 const updatedArticle = await Article.findOne({ 
                   where: { id: req.query.id } 
                 });
-                res.status(200).json({ user: updatedUser, article: updatedArticle });
+                const updatedOwner = await User.findOne({ 
+                  attributes: { exclude: ['emailAddress', 'password', 'createdAt', 'updatedAt'] }, 
+                  where: { id: article.User.id } 
+                });
+                res.status(200).json({ user: updatedUser, article: updatedArticle, owner: updatedOwner });
               }
             });
         }
