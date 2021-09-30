@@ -3043,6 +3043,19 @@
     {
       "title": "Seeding Issue for Reports",
       "description": "There's an issue seeding in the reports, might be because it has yet to be implemented and this is only a test",
+      "status": "open",
+      "userId": 1
+    },
+    {
+      "title": "Resolved Issue for Reports",
+      "description": "There's an issue seeding in the reports, might be because it has yet to be implemented and this is only a test",
+      "status": "resolved",
+      "userId": 1
+    },
+    {
+      "title": "Rejected Issue for Reports",
+      "description": "There's an issue seeding in the reports, might be because it has yet to be implemented and this is only a test",
+      "status": "rejected",
       "userId": 1
     }
   ]

@@ -103,13 +103,14 @@ class Database {
     return this.context
       .execute(`
         INSERT INTO "Reports"
-          ("userId", "title", "description", "createdAt", "updatedAt")
+          ("userId", "title", "description", "status", "createdAt", "updatedAt")
         VALUES
-          ($1, $2, $3, NOW(), NOW());
+          ($1, $2, $3, $4, NOW(), NOW());
       `, [
         report.userId,
         report.title,
-        report.description
+        report.description,
+        report.status
       ]
       );
   }
@@ -290,7 +291,8 @@ class Database {
       CREATE TABLE "Reports" (
         "id" SERIAL PRIMARY KEY, 
         "title" VARCHAR(255) NOT NULL DEFAULT '', 
-        "description" TEXT NOT NULL DEFAULT '', 
+        "description" TEXT NOT NULL DEFAULT '',
+        "status" VARCHAR(10) DEFAULT 'open', 
         "createdAt" timestamp NOT NULL, 
         "updatedAt" timestamp NOT NULL, 
         "userId" INTEGER NOT NULL DEFAULT -1

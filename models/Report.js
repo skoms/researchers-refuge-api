@@ -26,7 +26,10 @@ module.exports = (sequelize) => {
           msg: 'Please provide a value for "description"'
         }
       }
-    }
+    },
+    status: {
+      type: DataTypes.STRING
+    },
   }, { sequelize });
 
   Report.associate = (models) => {  
