@@ -9,6 +9,7 @@ class Database {
     this.users = seedData.users;
     this.topics = seedData.topics;
     this.categories = seedData.categories;
+    this.reports = seedData.reports;
     this.enableLogging = enableLogging;
     this.context = new Context('ResearchersRefuge', enableLogging);
   }
@@ -97,6 +98,22 @@ class Database {
       );
   }
 
+  // Inserts reports into database
+  createReport(report) {
+    return this.context
+      .execute(`
+        INSERT INTO "Reports"
+          ("userId", "title", "description", "createdAt", "updatedAt")
+        VALUES
+          ($1, $2, $3, NOW(), NOW());
+      `, [
+        report.userId,
+        report.title,
+        report.description
+      ]
+      );
+  }
+
   // Hashes the passwords in the for the database
   async hashUserPasswords(users) {
     const usersWithHashedPasswords = [];
@@ -134,6 +151,13 @@ class Database {
   async createCategories(categories) {
     for (const category of categories) {
       await this.createCategory(category);
+    }
+  }
+
+  // Inserts all the reports given as argument to the database
+  async createReports(reports) {
+    for (const report of reports) {
+      await this.createReport(report);
     }
   }
 
@@ -253,6 +277,30 @@ class Database {
     this.log('Creating the article records...');
 
     await this.createArticles(this.articles); 
+
+
+    this.log('Dropping the Reports table...');
+    await this.context.execute(`
+      DROP TABLE IF EXISTS "Reports";
+    `);
+
+    this.log('Creating the Reports table...');
+
+    await this.context.execute(`
+      CREATE TABLE "Reports" (
+        "id" SERIAL PRIMARY KEY, 
+        "title" VARCHAR(255) NOT NULL DEFAULT '', 
+        "description" TEXT NOT NULL DEFAULT '', 
+        "createdAt" timestamp NOT NULL, 
+        "updatedAt" timestamp NOT NULL, 
+        "userId" INTEGER NOT NULL DEFAULT -1
+          REFERENCES "Users" (id) ON DELETE CASCADE ON UPDATE CASCADE
+      );
+    `);
+
+    this.log('Creating the report records...');
+
+    await this.createReports(this.reports); 
 
     this.log('Database successfully initialized!');
   }

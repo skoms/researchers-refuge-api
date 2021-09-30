@@ -3038,5 +3038,12 @@
       "credits": 0,
       "published": "2021-09-14"
     }
+  ],
+  "reports": [
+    {
+      "title": "Seeding Issue for Reports",
+      "description": "There's an issue seeding in the reports, might be because it has yet to be implemented and this is only a test",
+      "userId": 1
+    }
   ]
 }
