@@ -13,7 +13,7 @@ const { Article, User, Topic, Category, Report } = require('../models');
 // Import Op
 const { Op } = require('../models').Sequelize;
 
-// GET finds and sends back a specific articles by tag
+// GET gets all the statistics on row count in needed tables
 router.get('/stats', authenticateLogin, asyncHandler(async (req, res) => {
   if ( req.currentUser.accessLevel === 'admin' ) {
     const totalUsers = await User.count();
@@ -53,6 +53,78 @@ router.get('/stats', authenticateLogin, asyncHandler(async (req, res) => {
         rejected: totalRejected
       }
     });
+  } else {
+    res.status(403).end();
+  }
+}));
+
+// GET gets all the users (and sorts if selected)
+router.get('/users', authenticateLogin, asyncHandler(async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    const { limit, page, sortColumn, sortOrder } = req.query;
+    const users = await User.findAll({ 
+      attributes:  { exclude: ['password'] },
+      limit: limit,
+      offset: page !== 0 ? ((page - 1) * limit) : 0,
+      order: [[sortColumn, sortOrder]]
+    });
+    const count = await User.count();
+    
+    const hasMore = (count - (page * limit)) > 0;
+    const lastPage = Math.ceil(count / limit);
+
+    const rangeStart = (
+      parseInt(page) === 1 ?
+        1 : 
+        (page - 1) * limit + 1
+    );
+    const rangeEnd = (
+      parseInt(page) === 1 ? 
+        users.indexOf( users[users.length - 1] ) + 1 : 
+        users.indexOf( users[users.length - 1] )+ (limit * (page - 1)) + 1 
+    );
+
+    res.status(200).json({users, hasMore, lastPage, count, rangeStart, rangeEnd});
+  } else {
+    res.status(403).end();
+  }
+}));
+
+// GET gets all the users (and sorts if selected) based on search query
+router.get('/users/search', authenticateLogin, asyncHandler(async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    const { limit, page, sortColumn, sortOrder, query } = req.query;
+    const users = await User.findAll({ 
+      attributes:  { exclude: ['password'] },
+      where: { 
+        [Op.or]: [
+        { firstName: { [Op.substring]: query } },
+        { lastName: { [Op.substring]: query } },
+        { emailAddress: { [Op.substring]: query } },
+        { accessLevel: { [Op.substring]: query } },
+        { id: (parseInt(query) ? parseInt(query) : 0) }
+      ]},
+      limit: limit,
+      offset: page !== 0 ? ((page - 1) * limit) : 0,
+      order: [[sortColumn, sortOrder]]
+    });
+    const count = await User.count();
+    
+    const hasMore = (count - (page * limit)) > 0;
+    const lastPage = Math.ceil(count / limit);
+
+    const rangeStart = (
+      parseInt(page) === 1 ?
+        1 : 
+        (page - 1) * limit + 1
+    );
+    const rangeEnd = (
+      parseInt(page) === 1 ? 
+        users.indexOf( users[users.length - 1] ) + 1 : 
+        users.indexOf( users[users.length - 1] )+ (limit * (page - 1)) + 1 
+    );
+
+    res.status(200).json({users, hasMore, lastPage, count, rangeStart, rangeEnd});
   } else {
     res.status(403).end();
   }
