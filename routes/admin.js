@@ -130,4 +130,77 @@ router.get('/users/search', authenticateLogin, asyncHandler(async (req, res) => 
   }
 }));
 
+// GET gets all the articles (and sorts if selected)
+router.get('/articles', authenticateLogin, asyncHandler(async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    const { limit, page, sortColumn, sortOrder } = req.query;
+    const articles = await Article.findAll({ 
+      include: [{ model: User, attributes: ['firstName', 'lastName'] }],
+      limit: limit,
+      offset: page !== 0 ? ((page - 1) * limit) : 0,
+      order: [[sortColumn, sortOrder]]
+    });
+    const count = await Article.count();
+    
+    const hasMore = (count - (page * limit)) > 0;
+    const lastPage = Math.ceil(count / limit);
+
+    const rangeStart = (
+      parseInt(page) === 1 ?
+        1 : 
+        (page - 1) * limit + 1
+    );
+    const rangeEnd = (
+      parseInt(page) === 1 ? 
+        articles.indexOf( articles[articles.length - 1] ) + 1 : 
+        articles.indexOf( articles[articles.length - 1] )+ (limit * (page - 1)) + 1 
+    );
+
+    res.status(200).json({articles, hasMore, lastPage, count, rangeStart, rangeEnd});
+  } else {
+    res.status(403).end();
+  }
+}));
+
+// GET gets all the articles (and sorts if selected) based on search query
+router.get('/articles/search', authenticateLogin, asyncHandler(async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    const { limit, page, sortColumn, sortOrder, query } = req.query;
+    const articles = await Article.findAll({ 
+      where: { 
+        [Op.or]: [
+        { title: { [Op.substring]: query } },
+        { topic: { [Op.substring]: query } },
+        { intro: { [Op.substring]: query } },
+        { body: { [Op.substring]: query } },
+        { id: (parseInt(query) ? parseInt(query) : 0) },
+        { userId: (parseInt(query) ? parseInt(query) : 0) }
+      ]},
+      include: [{ model: User, attributes: ['firstName', 'lastName'] }],
+      limit: limit,
+      offset: page !== 0 ? ((page - 1) * limit) : 0,
+      order: [[sortColumn, sortOrder]]
+    });
+    const count = await Article.count();
+    
+    const hasMore = (count - (page * limit)) > 0;
+    const lastPage = Math.ceil(count / limit);
+
+    const rangeStart = (
+      parseInt(page) === 1 ?
+        1 : 
+        (page - 1) * limit + 1
+    );
+    const rangeEnd = (
+      parseInt(page) === 1 ? 
+        articles.indexOf( articles[articles.length - 1] ) + 1 : 
+        articles.indexOf( articles[articles.length - 1] )+ (limit * (page - 1)) + 1 
+    );
+
+    res.status(200).json({articles, hasMore, lastPage, count, rangeStart, rangeEnd});
+  } else {
+    res.status(403).end();
+  }
+}));
+
 module.exports = router;
