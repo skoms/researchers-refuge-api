@@ -146,7 +146,7 @@ router.get('/articles', authenticateLogin, asyncHandler(async (req, res) => {
   if ( req.currentUser.accessLevel === 'admin' ) {
     const { limit, page, sortColumn, sortOrder } = req.query;
     const articles = await Article.findAll({ 
-      include: [{ model: User, attributes: ['firstName', 'lastName'] }],
+      include: [{ model: User, attributes: ['id', 'firstName', 'lastName'] }],
       limit: limit,
       offset: page !== 0 ? ((page - 1) * limit) : 0,
       order: [[sortColumn, sortOrder]]
@@ -188,7 +188,7 @@ router.get('/articles/search', authenticateLogin, asyncHandler(async (req, res) 
           { userId: (parseInt(query) ? parseInt(query) : 0) }
         ]
       },
-      include: [{ model: User, attributes: ['firstName', 'lastName'] }],
+      include: [{ model: User, attributes: ['id', 'firstName', 'lastName'] }],
       limit: limit,
       offset: page !== 0 ? ((page - 1) * limit) : 0,
       order: [[sortColumn, sortOrder]]
@@ -231,7 +231,7 @@ router.get('/topics', authenticateLogin, asyncHandler(async (req, res) => {
   if ( req.currentUser.accessLevel === 'admin' ) {
     const { limit, page, sortColumn, sortOrder } = req.query;
     const topics = await Topic.findAll({ 
-      include: [{ model: Category, attributes: ['name'] }],
+      include: [{ model: Category, attributes: ['id', 'name'] }],
       limit: limit,
       offset: page !== 0 ? ((page - 1) * limit) : 0,
       order: [[sortColumn, sortOrder]]
@@ -271,7 +271,7 @@ router.get('/topics/search', authenticateLogin, asyncHandler(async (req, res) =>
           { categoryId: (parseInt(query) ? parseInt(query) : 0) }
         ]
       },
-      include: [{ model: Category, attributes: ['name'] }],
+      include: [{ model: Category, attributes: ['id', 'name'] }],
       limit: limit,
       offset: page !== 0 ? ((page - 1) * limit) : 0,
       order: [[sortColumn, sortOrder]]
@@ -388,7 +388,7 @@ router.get('/reports', authenticateLogin, asyncHandler(async (req, res) => {
     const { status, limit, page, sortColumn, sortOrder } = req.query;
     const reports = await Report.findAll({ 
       where: { status: status },
-      include: [{ model: User, attributes: ['firstName', 'lastName'] }],
+      include: [{ model: User, attributes: ['id', 'firstName', 'lastName'] }],
       limit: limit,
       offset: page !== 0 ? ((page - 1) * limit) : 0,
       order: [[sortColumn, sortOrder]]
@@ -431,7 +431,7 @@ router.get('/reports/search', authenticateLogin, asyncHandler(async (req, res) =
           ]}
         ]
       },
-      include: [{ model: User, attributes: ['firstName', 'lastName'] }],
+      include: [{ model: User, attributes: ['id', 'firstName', 'lastName'] }],
       limit: limit,
       offset: page !== 0 ? ((page - 1) * limit) : 0,
       order: [[sortColumn, sortOrder]]
