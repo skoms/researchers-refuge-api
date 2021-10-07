@@ -26,9 +26,9 @@ class Database {
     return this.context
       .execute(`
         INSERT INTO "Users"
-          ("firstName", "lastName", "emailAddress", "password", "occupation", "bio", "mostActiveField", "articles", "credits", "followers", "following", "profileImgURL", "headerImgURL", "accessLevel", "accreditedArticles", "discreditedArticles", "createdAt", "updatedAt")
+          ("firstName", "lastName", "emailAddress", "password", "occupation", "bio", "mostActiveField", "articles", "credits", "followers", "following", "profileImgURL", "headerImgURL", "accessLevel", "accreditedArticles", "discreditedArticles", "blocked", "createdAt", "updatedAt")
         VALUES
-          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, NOW(), NOW());
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW());
       `,
         [
           user.firstName,
@@ -46,7 +46,8 @@ class Database {
           user.headerImgURL,
           user.accessLevel,
           user.accreditedArticles,
-          user.discreditedArticles
+          user.discreditedArticles,
+          user.blocked
         ]
       );
   }
@@ -56,9 +57,9 @@ class Database {
     return this.context
       .execute(`
         INSERT INTO "Articles"
-          ("userId", "topicId", "title", "topic", "intro", "body", "tags", "published", "credits", "createdAt", "updatedAt")
+          ("userId", "topicId", "title", "topic", "intro", "body", "tags", "published", "credits", "blocked", "createdAt", "updatedAt")
         VALUES
-          ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW());
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW());
       `, 
         [ 
           article.userId, 
@@ -69,7 +70,8 @@ class Database {
           article.body, 
           article.tags, 
           article.published,
-          article.credits 
+          article.credits,
+          article.blocked
         ]
       );
   }
@@ -190,6 +192,7 @@ class Database {
         "accessLevel" VARCHAR(255) DEFAULT 'none',
         "accreditedArticles" INTEGER[] DEFAULT '{}',
         "discreditedArticles" INTEGER[] DEFAULT '{}',
+        "blocked" BOOLEAN DEFAULT FALSE,
         "createdAt" timestamp NOT NULL, 
         "updatedAt" timestamp NOT NULL
       );
@@ -266,6 +269,7 @@ class Database {
         "tags" VARCHAR(255)[] NOT NULL, 
         "published" DATE NOT NULL,
         "credits" INTEGER DEFAULT 0,
+        "blocked" BOOLEAN DEFAULT FALSE,
         "createdAt" timestamp NOT NULL, 
         "updatedAt" timestamp NOT NULL, 
         "userId" INTEGER NOT NULL DEFAULT -1
