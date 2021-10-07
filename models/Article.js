@@ -78,6 +78,9 @@ module.exports = (sequelize) => {
     credits: {
       type: DataTypes.INTEGER,
     },
+    blocked: {
+      type: DataTypes.BOOLEAN,
+    }
   }, { sequelize });
 
   Article.associate = (models) => {  

@@ -117,6 +117,9 @@ module.exports = (sequelize) => {
     discreditedArticles: {
       type: DataTypes.ARRAY(DataTypes.INTEGER),
     },
+    blocked: {
+      type: DataTypes.BOOLEAN,
+    }
   }, { sequelize });
 
   User.associate = (models) => {  
