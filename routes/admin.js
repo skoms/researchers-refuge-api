@@ -13,6 +13,26 @@ const { Article, User, Topic, Category, Report } = require('../models');
 // Import Op
 const { Op } = require('../models').Sequelize;
 
+// Helps to get Model by type name
+const getModelByType = (type) => {
+  switch (type) {
+    case 'users':
+      return User;
+    case 'articles':
+      return Article;
+    case 'topics':
+      return Topic;
+    case 'categories':
+      return Category;
+    case 'reports':
+      return Report;
+  
+    default:
+      return null;
+      break;
+  }
+}
+
 // GET gets all the statistics on row count in needed tables
 router.get('/stats', authenticateLogin, asyncHandler(async (req, res) => {
   if ( req.currentUser.accessLevel === 'admin' ) {
@@ -465,6 +485,121 @@ router.get('/reports/search', authenticateLogin, asyncHandler(async (req, res) =
     );
 
     res.status(200).json({reports, hasMore, lastPage, count, rangeStart, rangeEnd});
+  } else {
+    res.status(403).end();
+  }
+}));
+
+router.post('/users', authenticateLogin, asyncHandler( async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await User.create(req.body);
+    const entry = await User.findOne({ where: { emailAddress: req.body.emailAddress } });
+    
+    res.status(201).json({entry});
+  } else {
+    res.status(403).end()
+  }
+}));
+
+router.post('/articles', authenticateLogin, asyncHandler( async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await Article.create(req.body);
+    const entry = await Article.findOne({ 
+      where: { 
+        [Op.and]: [
+          { userId: req.body.userId },
+          { title: req.body.title }
+        ] 
+      } 
+    });
+    
+    res.status(201).json({entry});
+  } else {
+    res.status(403).end()
+  }
+}));
+
+router.post('/topics', authenticateLogin, asyncHandler( async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await Topic.create(req.body);
+    const entry = await Topic.findOne({ where: { name: req.body.name } });
+    
+    res.status(201).json({entry});
+  } else {
+    res.status(403).end()
+  }
+}));
+
+router.post('/categories', authenticateLogin, asyncHandler( async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await Category.create(req.body);
+    const entry = await Category.findOne({ where: { name: req.body.name } });
+    
+    res.status(201).json({entry});
+  } else {
+    res.status(403).end()
+  }
+}));
+
+router.post('/reports', authenticateLogin, asyncHandler( async (req, res) => {
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await Report.create(req.body);
+    const entry = await Report.findOne({ 
+      where: { 
+        [Op.and]: [
+          { userId: req.body.userId },
+          { title: req.body.title }
+        ] 
+      } 
+    });
+    
+    res.status(201).json({entry});
+  } else {
+    res.status(403).end()
+  }
+}));
+
+router.put('/:type', authenticateLogin, asyncHandler( async (req, res) => {
+  const { id } = req.query;
+  const Model = getModelByType(req.params.type);
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await Model.update(req.body, { where: { id: id } });
+    const entry = await Model.findByPk(id);
+
+    res.status(201).json({entry});
+  } else {
+    res.status(403).end()
+  }
+}));
+
+router.put('/:type/block', authenticateLogin, asyncHandler( async (req, res) => {
+  const { id } = req.query;
+  const Model = getModelByType(req.params.type);
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    const entry = await Model.findByPk(id);
+    await Model.update(
+      {
+        ...entry,
+        blocked: !entry.blocked
+      }, 
+      { where: { id: id } }
+    );
+    
+    const updatedEntry = await Model.findByPk(id);
+
+    res.status(201).json({entry: updatedEntry});
+  } else {
+    res.status(403).end()
+  }
+}));
+
+router.delete('/:type', authenticateLogin, asyncHandler( async (req, res) => {
+  const { id } = req.query;
+  const Model = getModelByType(req.params.type);
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await Model.delete({ where: { id: id } });
+
+    res.status(204).end();
   } else {
     res.status(403).end();
   }
