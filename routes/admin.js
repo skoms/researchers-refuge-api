@@ -593,11 +593,22 @@ router.put('/:type/block', authenticateLogin, asyncHandler( async (req, res) => 
   }
 }));
 
+router.put('/reports/mark', authenticateLogin, asyncHandler( async (req, res) => {
+  const { status, id } = req.query;
+  if ( req.currentUser.accessLevel === 'admin' ) {
+    await Report.update({ status }, { where: { id: id } });
+
+    res.status(204).end();
+  } else {
+    res.status(403).end()
+  }
+}));
+
 router.delete('/:type', authenticateLogin, asyncHandler( async (req, res) => {
   const { id } = req.query;
   const Model = getModelByType(req.params.type);
   if ( req.currentUser.accessLevel === 'admin' ) {
-    await Model.delete({ where: { id: id } });
+    await Model.destroy({ where: { id: id } });
 
     res.status(204).end();
   } else {
