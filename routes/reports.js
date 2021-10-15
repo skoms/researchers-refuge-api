@@ -15,14 +15,18 @@ const { Op } = require('../models').Sequelize;
 
 // redirects users
 router.get('/', (req, res) => {
-  res.status(200).json({ message: 'Reports can only be accessed with the correct authorization and through its designated admin route'});
+  res.status(403).json({ message: 'Reports can only be accessed with the correct authorization and through its designated admin route'});
 });
 
-// GET finds and sends back a specific articles by tag
+// Post a new report to the DB
 router.post('/', authenticateLogin, asyncHandler(async (req, res) => {
-  req.body.userId = req.currentUser.id;
-  await Report.create(req.body);
-  res.status(201).end();
+  const reportBody = {
+    title: req.body.title,
+    description: req.body.description,
+    userId: req.body.userId || req.currentUser.id
+  }
+  await Report.create(reportBody);
+  res.status(204).end();
 }));
 
 module.exports = router;

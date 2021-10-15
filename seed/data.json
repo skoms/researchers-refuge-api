@@ -1,13 +1,13 @@
 {
   "users": [
     {
-      "firstName": "Root",
-      "lastName": "Admin",
+      "firstName": "root",
+      "lastName": "admin",
       "emailAddress": "root@admin.com",
       "password": "admin",
       "occupation": "administrator",
       "bio": "I am an administrator with a passion for Administration and Computer Science. I also love long walks in the forest!",
-      "mostActiveField": "Management",
+      "mostActiveField": "management",
       "articles": 2,
       "credits": 9001,
       "followers": [2,3,4,5,6],
@@ -20,11 +20,11 @@
       "blocked": false
     },
     {
-      "firstName": "Dean",
-      "lastName": "'MF' Jones",
+      "firstName": "dean",
+      "lastName": "jones",
       "emailAddress": "dean@jones.com",
       "password": "deanJones123",
-      "occupation": "Negotiator",
+      "occupation": "negotiator",
       "bio": "Best negotiator you'll ever find, you get nothing past me.",
       "mostActiveField": "crime",
       "articles": 2,
@@ -39,11 +39,11 @@
       "blocked": false
     },
     {
-      "firstName": "Zurawicz",
-      "lastName": "Johansson",
+      "firstName": "zurawicz",
+      "lastName": "johansson",
       "emailAddress": "zura.johansson@hotmail.com",
       "password": "zura123",
-      "occupation": "Web Developer",
+      "occupation": "web developer",
       "bio": "Passionate WebDev that would love to help anyone interested in the field <3",
       "mostActiveField": "computer science",
       "articles": 0,
@@ -58,11 +58,11 @@
       "blocked": false
     },
     {
-      "firstName": "Yerkes",
-      "lastName": "Bengtsson",
+      "firstName": "yerkes",
+      "lastName": "bengtsson",
       "emailAddress": "yerbeng@gmail.com",
       "password": "yerkes123",
-      "occupation": "Therapist",
+      "occupation": "therapist",
       "bio": "Loves to socialize with fellow brain-pickers. The mind is the most underestimated field open for exploration!",
       "mostActiveField": "psychology",
       "articles": 3,
@@ -77,11 +77,11 @@
       "blocked": true
     },
     {
-      "firstName": "Lara",
-      "lastName": "Thompson",
+      "firstName": "lara",
+      "lastName": "thompson",
       "emailAddress": "lara19@gmail.com",
       "password": "lara19",
-      "occupation": "CTO",
+      "occupation": "chief technology officer",
       "bio": "Chief Tech Officer with a passion for technological growth.",
       "mostActiveField": "computer science",
       "articles": 3,
@@ -96,11 +96,11 @@
       "blocked": false
     },
     {
-      "firstName": "Zuga",
-      "lastName": "Pyotrovna",
+      "firstName": "zuga",
+      "lastName": "pyotrovna",
       "emailAddress": "zuga@hotmail.com",
       "password": "zuga123",
-      "occupation": "Environmental Activist",
+      "occupation": "environmental activist",
       "bio": "If we don't take responsibility for the planet we inhabit, who will?",
       "mostActiveField": "environmental studies and forestry",
       "articles": 3,
@@ -115,11 +115,11 @@
       "blocked": false
     },
     {
-      "firstName": "Alex",
-      "lastName": "Hudson",
+      "firstName": "alex",
+      "lastName": "hudson",
       "emailAddress": "alex.hudson@hotmail.com",
       "password": "labrador",
-      "occupation": "Philosophy Professor",
+      "occupation": "philosophy professor",
       "bio": "\"We are what we repeatedly do. Excellence, then, is  not an act, but a habit.\" -Aristotle",
       "mostActiveField": "philosophy",
       "articles": 0,
@@ -134,11 +134,11 @@
       "blocked": false
     },
     {
-      "firstName": "Manuel",
-      "lastName": "Davis",
+      "firstName": "manuel",
+      "lastName": "davis",
       "emailAddress": "mdavis@hotmail.com",
       "password": "emilia",
-      "occupation": "Culinary Expert",
+      "occupation": "culinary expert",
       "bio": "Just a normal dude with over a decade of culinary expertize, lets talk about the art of food!",
       "mostActiveField": "the arts",
       "articles": 0,
@@ -153,11 +153,11 @@
       "blocked": false
     },
     {
-      "firstName": "Leslie",
-      "lastName": "King",
+      "firstName": "leslie",
+      "lastName": "king",
       "emailAddress": "leslie.king@hotmail.com",
       "password": "030303",
-      "occupation": "Corporate Attorney",
+      "occupation": "corporate attorney",
       "bio": "Corporate Attorney by day, **major** comics geek at night.",
       "mostActiveField": "law",
       "articles": 0,
@@ -172,11 +172,11 @@
       "blocked": false
     },
     {
-      "firstName": "Kurt",
-      "lastName": "Stevens",
+      "firstName": "kurt",
+      "lastName": "stevens",
       "emailAddress": "k.stevens@hotmail.com",
       "password": "markie",
-      "occupation": "Bioengineer",
+      "occupation": "bioengineer",
       "bio": "Jolly bloke that likes reading articles in his spare-time",
       "mostActiveField": "chemical engineering",
       "articles": 0,
@@ -191,11 +191,11 @@
       "blocked": false
     },
     {
-      "firstName": "Terri",
-      "lastName": "Dean",
+      "firstName": "terri",
+      "lastName": "dean",
       "emailAddress": "terriD@gmail.com",
       "password": "hoops",
-      "occupation": "Pedagogy Professor",
+      "occupation": "pedagogy professor",
       "bio": "I love teaching, it feels like I'm raising the future directly.",
       "mostActiveField": "education",
       "articles": 0,
@@ -210,11 +210,11 @@
       "blocked": false
     },
     {
-      "firstName": "David",
-      "lastName": "Hansen",
+      "firstName": "david",
+      "lastName": "hansen",
       "emailAddress": "dhansen@hotmail.com",
       "password": "peanuts",
-      "occupation": "Nutrition Counsellor",
+      "occupation": "nutrition counsellor",
       "bio": "If we don't take responsibility for the body we were control, who will?",
       "mostActiveField": "family and consumer science",
       "articles": 0,
@@ -229,11 +229,11 @@
       "blocked": false
     },
     {
-      "firstName": "Francis",
-      "lastName": "Sanchez",
+      "firstName": "francis",
+      "lastName": "sanchez",
       "emailAddress": "francisco.s@gmail.com",
       "password": "snakeS123",
-      "occupation": "Community Organizer",
+      "occupation": "community organizer",
       "bio": "I spend most of my work days helping less communities organize events, and build general community infrastructure",
       "mostActiveField": "social work",
       "articles": 0,
@@ -248,11 +248,11 @@
       "blocked": false
     },
     {
-      "firstName": "Melvin",
-      "lastName": "Payne",
+      "firstName": "melvin",
+      "lastName": "payne",
       "emailAddress": "melly.pay@gmail.com",
       "password": "hogtiedHog21",
-      "occupation": "Food Engineer",
+      "occupation": "food engineer",
       "bio": "Taking the everlasting world problems a little too personal, but never giving up!",
       "mostActiveField": "agriculture",
       "articles": 0,

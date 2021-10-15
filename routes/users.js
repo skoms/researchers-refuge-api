@@ -79,12 +79,13 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
 // GET find users by query
 router.get('/query', asyncHandler(async (req, res) => {
   const { query, page } = req.query;
+  const testedQuery = /\s/g.test(query) ? `(${query.split(' ').join(')|(')})` : query;
   const users = await User.findAll({ 
     attributes:  { exclude: ['emailAddress','password', 'createdAt', 'updatedAt'] },
     where: { 
       [Op.or]: [
-      { firstName: { [Op.substring]: query } },
-      { lastName: { [Op.substring]: query } }
+      { firstName: { [Op.iRegexp]: testedQuery } },
+      { lastName: { [Op.iRegexp]: testedQuery } }
     ]},
     limit: 5,
     offset: page !== 0 ? ((page - 1) * 5) : 0

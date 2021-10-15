@@ -45,7 +45,7 @@ router.get('/query', asyncHandler(async (req, res) => {
     attributes: ['id', 'name', 'relatedTags', 'categoryId'],
     where: { 
       [Op.or]: [
-      { name: { [Op.substring]: query } },
+      { name: { [Op.iRegexp]: query } },
       { relatedTags: { [Op.contains]: [query] } }
     ]}
   });

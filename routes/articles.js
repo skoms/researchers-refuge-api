@@ -129,10 +129,10 @@ router.get('/query', asyncHandler(async (req, res) => {
     include: [{ model: User, attributes: ['firstName', 'lastName', 'emailAddress']}],
     where: { 
       [Op.or]: [
-        { title: { [Op.substring]: query } },
-        { topic: { [Op.substring]: query } },
-        { intro: { [Op.substring]: query } },
-        { body:  { [Op.substring]: query } },
+        { title: { [Op.iRegexp]: query } },
+        { topic: { [Op.iRegexp]: query } },
+        { intro: { [Op.iRegexp]: query } },
+        { body:  { [Op.iRegexp]: query } },
         { tags:  { [Op.contains]: [query] } }
       ]
     },
@@ -141,10 +141,10 @@ router.get('/query', asyncHandler(async (req, res) => {
   });
   const count = await Article.count({ where: { 
     [Op.or]: [
-      { title: { [Op.substring]: query } },
-      { topic: { [Op.substring]: query } },
-      { intro: { [Op.substring]: query } },
-      { body:  { [Op.substring]: query } },
+      { title: { [Op.iRegexp]: query } },
+      { topic: { [Op.iRegexp]: query } },
+      { intro: { [Op.iRegexp]: query } },
+      { body:  { [Op.iRegexp]: query } },
       { tags:  { [Op.contains]: [query] } }
     ]
   }});
