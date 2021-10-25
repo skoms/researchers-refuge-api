@@ -13,7 +13,7 @@ const { Article, User, Topic, Category } = require('../models');
 // Import Op
 const { Op } = require('../models').Sequelize;
 
-const articleLimit = 5;
+const articleLimit = 10;
 
 
 // GET finds and displays all the articles based on filter and basic info on their owners
@@ -221,18 +221,26 @@ router.get('/owner', asyncHandler(async (req, res) => {
 
 // POST creates a new article and assigns the logged authenticated user as its owner
 router.post('/', authenticateLogin, asyncHandler(async (req, res) => {
-  req.body.userId = req.currentUser.id;
-  const topic = await Topic.findOne({ where: { name: req.body.topic } });
-  if (topic) {
-    req.body.topicId = topic.id;
-    const article = await Article.create(req.body);
-    await User.update(
-      { articles: req.currentUser.articles + 1 },
-      { where: { id: req.body.userId }}
-    );
-    res.status(201).json(article);
-  } else {
-    res.status(400).send(`Unable to find '${req.body.topic}'.`);
+  try {
+    req.body.userId = req.currentUser.id;
+    const topic = await Topic.findOne({ where: { name: req.body.topic } });
+    if (topic) {
+      req.body.topicId = topic.id;
+      req.body.tags = (
+        typeof req.body.tags === 'string' ? 
+          req.body.tags.split(',') : req.body.tags
+      );
+      const article = await Article.create(req.body);
+      await User.update(
+        { articles: req.currentUser.articles + 1 },
+        { where: { id: req.body.userId }}
+      );
+      res.status(201).json(article);
+    } else {
+      res.status(400).send(`Unable to find '${req.body.topic}'.`);
+    }
+  } catch (error) {
+    console.error(error);
   }
 }));
 

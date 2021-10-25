@@ -493,7 +493,10 @@ router.get('/reports/search', authenticateLogin, asyncHandler(async (req, res) =
 router.post('/users', authenticateLogin, asyncHandler( async (req, res) => {
   if ( req.currentUser.accessLevel === 'admin' ) {
     await User.create(req.body);
-    const entry = await User.findOne({ where: { emailAddress: req.body.emailAddress } });
+    const entry = await User.findOne({ 
+      where: { emailAddress: req.body.emailAddress },
+      attributes: { exclude: ['password'] }
+    });
     
     res.status(201).json({entry});
   } else {
