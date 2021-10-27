@@ -171,6 +171,7 @@ router.put('/', authenticateLogin, asyncHandler(async (req, res) => {
 
 // PUT updates 'followers' for the target and 'following' for the follow/unfollow, and returns both Users to update them
 router.put('/follow', authenticateLogin, asyncHandler(async (req, res) => {
+  const { id } = req.query;
   // Fetches the two users from the API
   const user = await User.findOne({
     attributes: [ 'id', 'following', 'emailAddress' ],
@@ -178,7 +179,8 @@ router.put('/follow', authenticateLogin, asyncHandler(async (req, res) => {
   });
   const target = await User.findOne({ 
     attributes: [ 'id', 'followers' ],
-    where: { id: req.query.id } });
+    where: { id } 
+  });
   
   const isOnline = user.emailAddress === req.currentUser.emailAddress;
 
@@ -199,7 +201,7 @@ router.put('/follow', authenticateLogin, asyncHandler(async (req, res) => {
       { where: { emailAddress: req.currentUser.emailAddress } });
     const targetRes = await User.update(
       { followers: updatedFollowers }, 
-      { where: { id: req.query.id } });
+      { where: { id } });
 
     // If it returns any data it was fail, so we check if theres any return
     if (!userRes.name && !targetRes.name) {
@@ -207,7 +209,7 @@ router.put('/follow', authenticateLogin, asyncHandler(async (req, res) => {
         where: { emailAddress: req.currentUser.emailAddress },
       });
       const target = await User.findOne({ attributes: { exclude: ['emailAddress','password', 'createdAt', 'updatedAt'] },  
-        where: { id: req.query.id } });
+        where: { id } });
       res.status(200).json({ user, target });
     }
   } else {
