@@ -244,28 +244,6 @@ router.post('/', authenticateLogin, asyncHandler(async (req, res) => {
   }
 }));
 
-// POST creates a new article ( Admin Only Route )
-router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
-  const isAdmin = req.currentUser.accessLevel === 'admin';
-  if (isAdmin) {
-    const topic = await Topic.findOne({ where: { name: req.body.topic } });
-    if (topic) {
-      req.body.topicId = topic.id;
-      const article = await Article.create(req.body);
-      const owner = await User.findByPk(req.body.userId);
-      await User.update(
-        { articles: owner.articles + 1 },
-        { where: { id: req.body.userId }}
-      );
-      res.status(201).json(article);
-    } else {
-      res.status(400).send(`Unable to find '${req.body.topic}'.`);
-    }
-  } else {
-    res.status(403).end();
-  }
-}));
-
 // PUT updates the chosen article if the user is authenticated to do so
 router.put('/', authenticateLogin, asyncHandler(async (req, res) => {
   const article = await Article.findOne({ where: { id: req.query.id } });
