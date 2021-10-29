@@ -114,16 +114,6 @@ router.post('/', asyncHandler(async (req, res) => {
   res.location('/').status(201).end();
 }));
 
-// POST creates a new user ( Admin Only )
-router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
-  const isAdmin = req.currentUser.accessLevel === 'admin';
-  if (isAdmin) {
-    await User.create(req.body);
-    res.location('/').status(201).end();
-  } else {
-    res.status(403).end();
-  }
-}));
 
 // PUT updates the chosen user if authenticated to do so
 router.put('/', authenticateLogin, asyncHandler(async (req, res) => {

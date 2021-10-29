@@ -178,41 +178,4 @@ router.get('/recommended', authenticateLogin, asyncHandler(async (req, res) => {
   }
 }));
 
-// POST creates a new topic ( Admin Only )
-router.post('/admin', authenticateLogin, asyncHandler(async (req, res) => {
-  const isAdmin = req.currentUser.accessLevel === 'admin';
-  if (isAdmin) {
-    const topic = await Topic.create(req.body);
-    res.location(`/api/topics/${topic.id}`).status(201).end();
-  } else {
-    res.status(403).end();
-  }
-}));
-
-// PUT updates the chosen topic ( Admin Only )
-router.put('/', authenticateLogin, asyncHandler(async (req, res) => {
-  const isAdmin = req.currentUser.accessLevel === 'admin';
-  if (isAdmin) {
-    await Topic.update(req.body, { where: { id: req.query.id } })
-      .then(response => {
-        if (!response.name) {
-          res.status(204).end()
-        }
-      });
-  } else {
-    res.status(403).end();
-  }
-}));
-
-// DELETE deletes the chosen topic ( Admin Only )
-router.delete('/', authenticateLogin, asyncHandler(async (req, res) => {
-  const isAdmin = req.currentUser.accessLevel === 'admin';
-  if (isAdmin) {
-    await Topic.destroy({ where: { id: req.query.id } })
-      .then(res.status(204).end());
-  } else {
-    res.status(403).end();
-  }
-}));
-
 module.exports = router;
