@@ -175,7 +175,7 @@ router.put('/follow', authenticateLogin, asyncHandler(async (req, res) => {
   const isOnline = user.emailAddress === req.currentUser.emailAddress;
 
   if (isOnline && user.id !== target.id) {
-    // Programatically checks and updates for both follow and unfollow, making sure you cant follow more than once
+    // Programmatically checks and updates for both follow and unfollow, making sure you cant follow more than once
     const userId = typeof user.id === 'number' ? user.id : parseInt(user.id);
     const targetId = typeof target.id === 'number' ? target.id : parseInt(target.id);
 
