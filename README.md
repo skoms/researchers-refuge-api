@@ -16,7 +16,7 @@ _On live demo please allow the website 30 seconds for cold-startup_
 
 ---
 
-# REST API SQLite Database for Researchers Refuge
+# REST API w/ PostgreSQL Database for Researchers Refuge
 
 <!-- vscode-markdown-toc -->
 
