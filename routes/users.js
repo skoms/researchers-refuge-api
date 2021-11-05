@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-// Import middlewares
+// Import middleware
 const asyncHandler = require('../middleware/async-handler')
 const authenticateLogin = require('../middleware/user-auth')
 
@@ -38,6 +38,15 @@ router.get(
 			where: { emailAddress: req.currentUser.emailAddress },
 		})
 		res.status(200).json(user)
+	})
+)
+
+// GET boolean of authorization
+router.get(
+	'/authorize',
+	authenticateLogin,
+	asyncHandler(async (req, res) => {
+		res.status(200).json(req.currentUser.accessLevel === 'admin')
 	})
 )
 
